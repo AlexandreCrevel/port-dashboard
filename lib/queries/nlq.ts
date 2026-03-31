@@ -1,6 +1,8 @@
+import { sqlSafetySchema } from '../schemas';
 import { dbReadonly } from '../db';
 import { sql } from 'drizzle-orm';
 
 export async function executeNlqQuery(sqlQuery: string) {
-  return dbReadonly.execute(sql.raw(sqlQuery));
+  const validatedQuery = sqlSafetySchema.parse(sqlQuery);
+  return dbReadonly.execute(sql.raw(validatedQuery));
 }

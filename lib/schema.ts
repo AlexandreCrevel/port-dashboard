@@ -23,7 +23,7 @@ const geometry = customType<{
   },
   fromDriver(value: string) {
     const match = value.match(/([-\d.]+)\s+([-\d.]+)/);
-    if (!match) return { longitude: 0, latitude: 0 };
+    if (!match) throw new Error(`Invalid PostGIS geometry value: ${value}`);
     return { longitude: parseFloat(match[1]), latitude: parseFloat(match[2]) };
   },
 });

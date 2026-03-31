@@ -34,7 +34,7 @@ export async function getTrafficTimeline(hours: number = 24) {
   return db.execute(sql`
     SELECT date_trunc('hour', p.timestamp) as hour, COUNT(DISTINCT p.mmsi) as vessel_count
     FROM positions p
-    WHERE p.timestamp > NOW() - INTERVAL '${sql.raw(String(hours))} hours'
+    WHERE p.timestamp > NOW() - (${hours} * INTERVAL '1 hour')
     GROUP BY date_trunc('hour', p.timestamp)
     ORDER BY hour
   `);

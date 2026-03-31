@@ -10,6 +10,6 @@ export async function getWeatherHistory(hours: number = 24) {
   return db
     .select()
     .from(weatherReadings)
-    .where(gte(weatherReadings.timestamp, sql`NOW() - INTERVAL '${sql.raw(String(hours))} hours'`))
+    .where(gte(weatherReadings.timestamp, sql`NOW() - (${hours} * INTERVAL '1 hour')`))
     .orderBy(weatherReadings.timestamp);
 }

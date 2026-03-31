@@ -1,26 +1,25 @@
-export interface Vessel {
-  mmsi: string;
-  name: string | null;
-  vesselType: string | null;
-  flag: string | null;
-  length: number | null;
-  width: number | null;
-  destination: string | null;
-  firstSeen: Date;
-  lastSeen: Date;
-}
+import type { z } from "zod";
+import type {
+  vesselSchema,
+  positionSchema,
+  weatherReadingSchema,
+  nlqRequestSchema,
+} from "@/lib/schemas";
 
-export interface Position {
+// Derived from Zod schemas — single source of truth
+export type Vessel = z.infer<typeof vesselSchema>;
+export type NlqRequest = z.infer<typeof nlqRequestSchema>;
+
+// Extend schema types with DB-specific fields (id generated server-side)
+export interface Position extends z.infer<typeof positionSchema> {
   id: number;
-  mmsi: string;
-  longitude: number;
-  latitude: number;
-  speed: number | null;
-  heading: number | null;
-  course: number | null;
-  timestamp: Date;
 }
 
+export interface WeatherReading extends z.infer<typeof weatherReadingSchema> {
+  id: number;
+}
+
+// Composite types without a direct Zod schema equivalent
 export interface VesselWithPosition extends Vessel {
   longitude: number;
   latitude: number;
@@ -30,14 +29,10 @@ export interface VesselWithPosition extends Vessel {
   positionTimestamp: Date;
 }
 
-export interface WeatherReading {
-  id: number;
-  timestamp: Date;
-  windSpeed: number | null;
-  windDirection: number | null;
-  waveHeight: number | null;
-  visibility: number | null;
-  temperature: number | null;
+export interface NotableEvent {
+  title: string;
+  description: string;
+  type: "arrival" | "departure" | "weather" | "traffic" | "other";
 }
 
 export interface DailySummary {
@@ -46,16 +41,6 @@ export interface DailySummary {
   summary: string;
   notableEvents: NotableEvent[] | null;
   generatedAt: Date;
-}
-
-export interface NotableEvent {
-  title: string;
-  description: string;
-  type: 'arrival' | 'departure' | 'weather' | 'traffic' | 'other';
-}
-
-export interface NlqRequest {
-  query: string;
 }
 
 export interface NlqResponse {

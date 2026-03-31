@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { NLQ_TIMEOUT_MS } from '@/lib/constants';
+import * as schema from './schema';
 
 const EnvSchema = z.object({
   DATABASE_URL: z.string().url(),
@@ -24,11 +25,11 @@ const pool = new Pool({
   connectionString: env.DATABASE_URL,
 });
 
-export const db = drizzle(pool);
+export const db = drizzle(pool, { schema });
 
 const readonlyPool = new Pool({
   connectionString: env.DATABASE_URL_READONLY,
   statement_timeout: NLQ_TIMEOUT_MS,
 });
 
-export const dbReadonly = drizzle(readonlyPool);
+export const dbReadonly = drizzle(readonlyPool, { schema });

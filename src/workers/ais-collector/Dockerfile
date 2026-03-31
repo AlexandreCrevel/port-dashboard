@@ -3,4 +3,4 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 COPY . .
-CMD ["node", "--loader", "tsx", "index.ts"]
+CMD ["node", "--import", "tsx", "index.ts"]

@@ -1,7 +1,8 @@
 import { Pool } from "pg";
+import { env } from "./env.js";
 import type { ParsedPosition, ParsedStaticData } from "./parser.js";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({ connectionString: env.DATABASE_URL });
 
 export function getVesselCategory(typeCode: number): string {
   if (typeCode >= 70 && typeCode <= 79) return "Cargo";
@@ -65,4 +66,8 @@ export async function insertPosition(data: ParsedPosition) {
       data.timestamp,
     ],
   );
+}
+
+export async function closePool() {
+  await pool.end();
 }

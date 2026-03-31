@@ -7,22 +7,31 @@ import {
 } from "./db-operations.js";
 
 const AIS_WS_URL = "wss://stream.aisstream.io/v0/stream";
-const RECONNECT_DELAY_MS = 5000;
+const INITIAL_RECONNECT_DELAY_MS = 1000;
+const MAX_RECONNECT_DELAY_MS = 60000;
 
 const BOUNDING_BOX = {
   min: { latitude: 49.4, longitude: -0.15 },
   max: { latitude: 49.55, longitude: 0.4 },
 };
 
-export function connect() {
+let currentWs: WebSocket | null = null;
+let reconnectDelay = INITIAL_RECONNECT_DELAY_MS;
+let shuttingDown = false;
+
+export function connect(apiKey: string) {
+  if (shuttingDown) return;
+
   console.log("[AIS] Connecting to AISstream...");
   const ws = new WebSocket(AIS_WS_URL);
+  currentWs = ws;
 
   ws.on("open", () => {
     console.log("[AIS] Connected. Sending subscription...");
+    reconnectDelay = INITIAL_RECONNECT_DELAY_MS;
     ws.send(
       JSON.stringify({
-        APIKey: process.env.AISSTREAM_API_KEY,
+        APIKey: apiKey,
         BoundingBoxes: [
           [
             [BOUNDING_BOX.min.latitude, BOUNDING_BOX.min.longitude],
@@ -56,9 +65,21 @@ export function connect() {
 
   ws.on("error", (err) => console.error("[AIS] WebSocket error:", err.message));
   ws.on("close", (code) => {
+    currentWs = null;
+    if (shuttingDown) return;
+
     console.log(
-      `[AIS] Closed (${code}). Reconnecting in ${RECONNECT_DELAY_MS}ms...`,
+      `[AIS] Closed (${code}). Reconnecting in ${reconnectDelay}ms...`,
     );
-    setTimeout(connect, RECONNECT_DELAY_MS);
+    setTimeout(() => connect(apiKey), reconnectDelay);
+    reconnectDelay = Math.min(reconnectDelay * 2, MAX_RECONNECT_DELAY_MS);
   });
+}
+
+export function disconnect() {
+  shuttingDown = true;
+  if (currentWs) {
+    currentWs.close();
+    currentWs = null;
+  }
 }

@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node --loader tsx index.ts",
-    "dev": "node --watch --loader tsx index.ts"
+    "start": "node --import tsx index.ts",
+    "dev": "node --watch --import tsx index.ts"
   },
   "dependencies": {
     "pg": "^8.13.0",

@@ -16,42 +16,43 @@
 
 Every subagent MUST follow these rules. Non-negotiable.
 
-| Rule | Threshold |
-|------|-----------|
-| **Max lines per file** | 150 (200 hard limit). Split proactively. |
-| **TDD** | Mandatory. Failing test FIRST, always. No exception. |
-| **Test coverage** | 80% minimum. Run `npm test -- --run --coverage` at each phase end. |
-| **DRY** | Zero duplication. Extract to utils/hooks on second occurrence. |
-| **Separation of Concerns** | One responsibility per file. No god files. |
-| **Single Responsibility** | Each function does one thing. One level of abstraction. |
-| **Naming** | Descriptive, intentional names. No abbreviations (except well-known: `db`, `api`, `url`). |
-| **No magic values** | All literals extracted to constants. |
-| **No hidden side effects** | Pure functions wherever possible. Side effects explicit and isolated. |
-| **Clean Code** | Follow all Clean Code principles (Robert C. Martin). |
+| Rule                       | Threshold                                                                                 |
+| -------------------------- | ----------------------------------------------------------------------------------------- |
+| **Max lines per file**     | 150 (200 hard limit). Split proactively.                                                  |
+| **TDD**                    | Mandatory. Failing test FIRST, always. No exception.                                      |
+| **Test coverage**          | 80% minimum. Run `npm test -- --run --coverage` at each phase end.                        |
+| **DRY**                    | Zero duplication. Extract to utils/hooks on second occurrence.                            |
+| **Separation of Concerns** | One responsibility per file. No god files.                                                |
+| **Single Responsibility**  | Each function does one thing. One level of abstraction.                                   |
+| **Naming**                 | Descriptive, intentional names. No abbreviations (except well-known: `db`, `api`, `url`). |
+| **No magic values**        | All literals extracted to constants.                                                      |
+| **No hidden side effects** | Pure functions wherever possible. Side effects explicit and isolated.                     |
+| **Clean Code**             | Follow all Clean Code principles (Robert C. Martin).                                      |
 
 ### File Split Strategy
 
 To respect the 150-line limit, the following files from the original plan MUST be split:
 
-| Original file | Split into | Responsibility |
-|---|---|---|
-| `src/lib/constants.ts` | `src/lib/constants/port-config.ts` | Port configuration (coords, bbox, geofence) |
-| | `src/lib/constants/vessel-types.ts` | Vessel type codes, categories, colors |
-| | `src/lib/constants/app-config.ts` | SSE, polling, timeout, retention, API URLs |
-| | `src/lib/constants/index.ts` | Re-export barrel |
-| `src/lib/db-utils.ts` | `src/lib/queries/vessels.ts` | Vessel + position queries |
-| | `src/lib/queries/weather.ts` | Weather queries |
-| | `src/lib/queries/summaries.ts` | Summary queries |
-| | `src/lib/queries/nlq.ts` | NLQ execution (read-only) |
-| | `src/lib/queries/kpi.ts` | KPI aggregate queries |
-| | `src/lib/queries/index.ts` | Re-export barrel |
-| `src/workers/ais-collector/index.ts` | `src/workers/ais-collector/db-operations.ts` | Upsert vessel, insert position |
-| | `src/workers/ais-collector/connection.ts` | WebSocket connect/reconnect logic |
-| | `src/workers/ais-collector/index.ts` | Entry point (wires connection + db ops) |
+| Original file                        | Split into                                   | Responsibility                              |
+| ------------------------------------ | -------------------------------------------- | ------------------------------------------- |
+| `src/lib/constants.ts`               | `src/lib/constants/port-config.ts`           | Port configuration (coords, bbox, geofence) |
+|                                      | `src/lib/constants/vessel-types.ts`          | Vessel type codes, categories, colors       |
+|                                      | `src/lib/constants/app-config.ts`            | SSE, polling, timeout, retention, API URLs  |
+|                                      | `src/lib/constants/index.ts`                 | Re-export barrel                            |
+| `src/lib/db-utils.ts`                | `src/lib/queries/vessels.ts`                 | Vessel + position queries                   |
+|                                      | `src/lib/queries/weather.ts`                 | Weather queries                             |
+|                                      | `src/lib/queries/summaries.ts`               | Summary queries                             |
+|                                      | `src/lib/queries/nlq.ts`                     | NLQ execution (read-only)                   |
+|                                      | `src/lib/queries/kpi.ts`                     | KPI aggregate queries                       |
+|                                      | `src/lib/queries/index.ts`                   | Re-export barrel                            |
+| `src/workers/ais-collector/index.ts` | `src/workers/ais-collector/db-operations.ts` | Upsert vessel, insert position              |
+|                                      | `src/workers/ais-collector/connection.ts`    | WebSocket connect/reconnect logic           |
+|                                      | `src/workers/ais-collector/index.ts`         | Entry point (wires connection + db ops)     |
 
 ### Coverage Checkpoints
 
 Run coverage at the end of each phase and verify 80%+ on all new code:
+
 ```bash
 npm test -- --run --coverage
 ```
@@ -65,6 +66,7 @@ npm test -- --run --coverage
 **Files:** Everything generated by `create-next-app`
 
 - [ ] **Step 1:** Scaffold project
+
 ```bash
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm
 ```
@@ -72,11 +74,13 @@ npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --
 - [ ] **Step 2:** Verify `tsconfig.json` has `"strict": true`
 
 - [ ] **Step 3:** Verify build works
+
 ```bash
 npm run build
 ```
 
 - [ ] **Step 4:** Commit
+
 ```bash
 git add -A && git commit -m "chore: scaffold Next.js project with App Router and TypeScript strict mode"
 ```
@@ -86,11 +90,13 @@ git add -A && git commit -m "chore: scaffold Next.js project with App Router and
 ### Task 1.2: Install core dependencies
 
 - [ ] **Step 1:** Install runtime deps
+
 ```bash
 npm i drizzle-orm pg zod zustand @tanstack/react-query @tanstack/react-query-devtools recharts maplibre-gl @google/genai
 ```
 
 - [ ] **Step 2:** Install dev deps
+
 ```bash
 npm i -D drizzle-kit @types/pg vitest @vitejs/plugin-react jsdom @testing-library/react @testing-library/jest-dom tsx
 ```
@@ -98,6 +104,7 @@ npm i -D drizzle-kit @types/pg vitest @vitejs/plugin-react jsdom @testing-librar
 - [ ] **Step 3:** Verify with `npm ls --depth=0`
 
 - [ ] **Step 4:** Commit
+
 ```bash
 git add package.json package-lock.json && git commit -m "chore: install core dependencies (drizzle, zustand, tanstack-query, maplibre, recharts, gemini)"
 ```
@@ -107,12 +114,15 @@ git add package.json package-lock.json && git commit -m "chore: install core dep
 ### Task 1.3: Install and configure shadcn/ui
 
 - [ ] **Step 1:** Init shadcn
+
 ```bash
 npx shadcn@latest init
 ```
+
 Select: default style, slate base color, CSS variables.
 
 - [ ] **Step 2:** Install core components
+
 ```bash
 npx shadcn@latest add button card input badge tabs separator skeleton sheet
 ```
@@ -120,6 +130,7 @@ npx shadcn@latest add button card input badge tabs separator skeleton sheet
 - [ ] **Step 3:** Verify `src/components/ui/` is populated and `src/lib/utils.ts` has `cn()` helper
 
 - [ ] **Step 4:** Commit
+
 ```bash
 git add -A && git commit -m "chore: initialize shadcn/ui with core components"
 ```
@@ -129,37 +140,41 @@ git add -A && git commit -m "chore: initialize shadcn/ui with core components"
 ### Task 1.4: Configure Vitest
 
 **Files:**
+
 - Create: `vitest.config.ts`
 - Create: `src/test/setup.ts`
 - Modify: `package.json` (scripts)
 
 - [ ] **Step 1:** Create `vitest.config.ts`
+
 ```typescript
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ["./src/test/setup.ts"],
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });
 ```
 
 - [ ] **Step 2:** Create `src/test/setup.ts`
+
 ```typescript
-import '@testing-library/jest-dom/vitest';
+import "@testing-library/jest-dom/vitest";
 ```
 
 - [ ] **Step 3:** Add test scripts to `package.json`
+
 ```json
 {
   "scripts": {
@@ -171,11 +186,12 @@ import '@testing-library/jest-dom/vitest';
 ```
 
 - [ ] **Step 4:** Create smoke test `src/test/smoke.test.ts`
-```typescript
-import { describe, it, expect } from 'vitest';
 
-describe('smoke', () => {
-  it('works', () => {
+```typescript
+import { describe, it, expect } from "vitest";
+
+describe("smoke", () => {
+  it("works", () => {
     expect(1 + 1).toBe(2);
   });
 });
@@ -184,6 +200,7 @@ describe('smoke', () => {
 - [ ] **Step 5:** Run `npm test -- --run` — expect PASS
 
 - [ ] **Step 6:** Commit
+
 ```bash
 git add vitest.config.ts src/test/ package.json && git commit -m "chore: configure Vitest with jsdom and React Testing Library"
 ```
@@ -193,6 +210,7 @@ git add vitest.config.ts src/test/ package.json && git commit -m "chore: configu
 ### Task 1.5: Create centralized port configuration (split into 3 files + barrel)
 
 **Files:**
+
 - Create: `src/lib/constants/port-config.ts` (~30 lines)
 - Create: `src/lib/constants/vessel-types.ts` (~45 lines)
 - Create: `src/lib/constants/app-config.ts` (~15 lines)
@@ -201,17 +219,18 @@ git add vitest.config.ts src/test/ package.json && git commit -m "chore: configu
 - Create: `src/lib/__tests__/vessel-types.test.ts`
 
 - [ ] **Step 1:** Write test `src/lib/__tests__/port-config.test.ts`
-```typescript
-import { describe, it, expect } from 'vitest';
-import { PORT_CONFIG } from '../constants';
 
-describe('PORT_CONFIG', () => {
-  it('has valid center coordinates for Le Havre', () => {
+```typescript
+import { describe, it, expect } from "vitest";
+import { PORT_CONFIG } from "../constants";
+
+describe("PORT_CONFIG", () => {
+  it("has valid center coordinates for Le Havre", () => {
     expect(PORT_CONFIG.center.latitude).toBeCloseTo(49.49, 1);
     expect(PORT_CONFIG.center.longitude).toBeCloseTo(0.11, 1);
   });
 
-  it('has bounding box that contains center', () => {
+  it("has bounding box that contains center", () => {
     const { center, boundingBox } = PORT_CONFIG;
     expect(center.latitude).toBeGreaterThan(boundingBox.min.latitude);
     expect(center.latitude).toBeLessThan(boundingBox.max.latitude);
@@ -219,7 +238,7 @@ describe('PORT_CONFIG', () => {
     expect(center.longitude).toBeLessThan(boundingBox.max.longitude);
   });
 
-  it('has closed geofence polygon', () => {
+  it("has closed geofence polygon", () => {
     const geo = PORT_CONFIG.geofence;
     expect(geo[0]).toEqual(geo[geo.length - 1]);
   });
@@ -227,12 +246,13 @@ describe('PORT_CONFIG', () => {
 ```
 
 - [ ] **Step 2:** Write test `src/lib/__tests__/vessel-types.test.ts`
-```typescript
-import { describe, it, expect } from 'vitest';
-import { VESSEL_TYPE_COLORS, VESSEL_TYPE_CATEGORIES } from '../constants';
 
-describe('VESSEL_TYPE_CATEGORIES', () => {
-  it('has a color for every category', () => {
+```typescript
+import { describe, it, expect } from "vitest";
+import { VESSEL_TYPE_COLORS, VESSEL_TYPE_CATEGORIES } from "../constants";
+
+describe("VESSEL_TYPE_CATEGORIES", () => {
+  it("has a color for every category", () => {
     for (const category of Object.keys(VESSEL_TYPE_CATEGORIES)) {
       expect(VESSEL_TYPE_COLORS).toHaveProperty(category);
     }
@@ -241,16 +261,18 @@ describe('VESSEL_TYPE_CATEGORIES', () => {
 ```
 
 - [ ] **Step 3:** Run tests — expect FAIL
+
 ```bash
 npm test -- --run src/lib/__tests__/port-config.test.ts src/lib/__tests__/vessel-types.test.ts
 ```
 
 - [ ] **Step 4:** Create `src/lib/constants/port-config.ts`
+
 ```typescript
 export const PORT_CONFIG = {
-  name: 'Le Havre',
-  slug: 'le-havre',
-  timezone: 'Europe/Paris',
+  name: "Le Havre",
+  slug: "le-havre",
+  timezone: "Europe/Paris",
   center: {
     latitude: 49.4944,
     longitude: 0.1079,
@@ -261,8 +283,8 @@ export const PORT_CONFIG = {
     maxZoom: 18,
   },
   boundingBox: {
-    min: { latitude: 49.40, longitude: -0.15 },
-    max: { latitude: 49.55, longitude: 0.40 },
+    min: { latitude: 49.4, longitude: -0.15 },
+    max: { latitude: 49.55, longitude: 0.4 },
   },
   geofence: [
     [0.04, 49.46],
@@ -281,27 +303,28 @@ export type PortConfig = typeof PORT_CONFIG;
 ```
 
 - [ ] **Step 5:** Create `src/lib/constants/vessel-types.ts`
+
 ```typescript
 export const VESSEL_TYPES: Record<number, string> = {
-  20: 'Wing in Ground',
-  30: 'Fishing',
-  31: 'Towing',
-  32: 'Towing (large)',
-  33: 'Dredging',
-  34: 'Diving Operations',
-  35: 'Military Operations',
-  36: 'Sailing',
-  37: 'Pleasure Craft',
-  40: 'High Speed Craft',
-  50: 'Pilot Vessel',
-  51: 'Search and Rescue',
-  52: 'Tug',
-  53: 'Port Tender',
-  55: 'Law Enforcement',
-  60: 'Passenger',
-  70: 'Cargo',
-  80: 'Tanker',
-  90: 'Other',
+  20: "Wing in Ground",
+  30: "Fishing",
+  31: "Towing",
+  32: "Towing (large)",
+  33: "Dredging",
+  34: "Diving Operations",
+  35: "Military Operations",
+  36: "Sailing",
+  37: "Pleasure Craft",
+  40: "High Speed Craft",
+  50: "Pilot Vessel",
+  51: "Search and Rescue",
+  52: "Tug",
+  53: "Port Tender",
+  55: "Law Enforcement",
+  60: "Passenger",
+  70: "Cargo",
+  80: "Tanker",
+  90: "Other",
 };
 
 export const VESSEL_TYPE_CATEGORIES = {
@@ -310,22 +333,23 @@ export const VESSEL_TYPE_CATEGORIES = {
   Passenger: [60, 61, 62, 63, 64, 65, 66, 67, 68, 69],
   Fishing: [30],
   Tug: [52],
-  'High Speed Craft': [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+  "High Speed Craft": [40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
   Other: [],
 } as const;
 
 export const VESSEL_TYPE_COLORS: Record<string, string> = {
-  Cargo: '#3b82f6',
-  Tanker: '#ef4444',
-  Passenger: '#22c55e',
-  Fishing: '#f59e0b',
-  Tug: '#8b5cf6',
-  'High Speed Craft': '#06b6d4',
-  Other: '#6b7280',
+  Cargo: "#3b82f6",
+  Tanker: "#ef4444",
+  Passenger: "#22c55e",
+  Fishing: "#f59e0b",
+  Tug: "#8b5cf6",
+  "High Speed Craft": "#06b6d4",
+  Other: "#6b7280",
 };
 ```
 
 - [ ] **Step 6:** Create `src/lib/constants/app-config.ts`
+
 ```typescript
 export const SSE_RETRY_MS = 3000;
 export const POLLING_FALLBACK_MS = 30_000;
@@ -333,26 +357,40 @@ export const NLQ_TIMEOUT_MS = 5000;
 export const DATA_RETENTION_DAYS = 90;
 
 export const WEATHER_API = {
-  forecast: 'https://api.open-meteo.com/v1/forecast',
-  marine: 'https://marine-api.open-meteo.com/v1/marine',
+  forecast: "https://api.open-meteo.com/v1/forecast",
+  marine: "https://marine-api.open-meteo.com/v1/marine",
 } as const;
 
-export const AIS_WEBSOCKET_URL = 'wss://stream.aisstream.io/v0/stream';
+export const AIS_WEBSOCKET_URL = "wss://stream.aisstream.io/v0/stream";
 ```
 
 - [ ] **Step 7:** Create `src/lib/constants/index.ts`
+
 ```typescript
-export { PORT_CONFIG, type PortConfig } from './port-config';
-export { VESSEL_TYPES, VESSEL_TYPE_CATEGORIES, VESSEL_TYPE_COLORS } from './vessel-types';
-export { SSE_RETRY_MS, POLLING_FALLBACK_MS, NLQ_TIMEOUT_MS, DATA_RETENTION_DAYS, WEATHER_API, AIS_WEBSOCKET_URL } from './app-config';
+export { PORT_CONFIG, type PortConfig } from "./port-config";
+export {
+  VESSEL_TYPES,
+  VESSEL_TYPE_CATEGORIES,
+  VESSEL_TYPE_COLORS,
+} from "./vessel-types";
+export {
+  SSE_RETRY_MS,
+  POLLING_FALLBACK_MS,
+  NLQ_TIMEOUT_MS,
+  DATA_RETENTION_DAYS,
+  WEATHER_API,
+  AIS_WEBSOCKET_URL,
+} from "./app-config";
 ```
 
 - [ ] **Step 8:** Run tests — expect PASS
+
 ```bash
 npm test -- --run src/lib/__tests__/port-config.test.ts src/lib/__tests__/vessel-types.test.ts
 ```
 
 - [ ] **Step 9:** Commit
+
 ```bash
 git add src/lib/constants/ src/lib/__tests__/port-config.test.ts src/lib/__tests__/vessel-types.test.ts && git commit -m "feat: add centralized port configuration and vessel type constants (SoC split)"
 ```
@@ -362,9 +400,11 @@ git add src/lib/constants/ src/lib/__tests__/port-config.test.ts src/lib/__tests
 ### Task 1.6: Create shared TypeScript types
 
 **Files:**
+
 - Create: `src/types/index.ts`
 
 - [ ] **Step 1:** Create `src/types/index.ts`
+
 ```typescript
 export interface Vessel {
   mmsi: string;
@@ -419,7 +459,7 @@ export interface DailySummary {
 export interface NotableEvent {
   title: string;
   description: string;
-  type: 'arrival' | 'departure' | 'weather' | 'traffic' | 'other';
+  type: "arrival" | "departure" | "weather" | "traffic" | "other";
 }
 
 export interface NlqRequest {
@@ -451,6 +491,7 @@ export interface TrafficDataPoint {
 ```
 
 - [ ] **Step 2:** Commit
+
 ```bash
 git add src/types/index.ts && git commit -m "feat: add shared TypeScript type definitions"
 ```
@@ -460,50 +501,62 @@ git add src/types/index.ts && git commit -m "feat: add shared TypeScript type de
 ### Task 1.7: Create Zod validation schemas
 
 **Files:**
+
 - Create: `src/lib/schemas.ts`
 - Create: `src/lib/__tests__/schemas.test.ts`
 
 - [ ] **Step 1:** Write test `src/lib/__tests__/schemas.test.ts`
+
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { sqlSafetySchema, positionSchema, nlqRequestSchema } from '../schemas';
+import { describe, it, expect } from "vitest";
+import { sqlSafetySchema, positionSchema, nlqRequestSchema } from "../schemas";
 
-describe('sqlSafetySchema', () => {
-  it('accepts valid SELECT queries', () => {
-    expect(sqlSafetySchema.safeParse('SELECT * FROM vessels').success).toBe(true);
-    expect(sqlSafetySchema.safeParse("SELECT name FROM vessels WHERE mmsi = '123456789'").success).toBe(true);
+describe("sqlSafetySchema", () => {
+  it("accepts valid SELECT queries", () => {
+    expect(sqlSafetySchema.safeParse("SELECT * FROM vessels").success).toBe(
+      true,
+    );
+    expect(
+      sqlSafetySchema.safeParse(
+        "SELECT name FROM vessels WHERE mmsi = '123456789'",
+      ).success,
+    ).toBe(true);
   });
 
-  it('rejects INSERT statements', () => {
-    expect(sqlSafetySchema.safeParse('INSERT INTO vessels VALUES (1)').success).toBe(false);
+  it("rejects INSERT statements", () => {
+    expect(
+      sqlSafetySchema.safeParse("INSERT INTO vessels VALUES (1)").success,
+    ).toBe(false);
   });
 
-  it('rejects DROP statements', () => {
-    expect(sqlSafetySchema.safeParse('DROP TABLE vessels').success).toBe(false);
+  it("rejects DROP statements", () => {
+    expect(sqlSafetySchema.safeParse("DROP TABLE vessels").success).toBe(false);
   });
 
-  it('rejects multiple statements', () => {
-    expect(sqlSafetySchema.safeParse('SELECT 1; DROP TABLE vessels').success).toBe(false);
+  it("rejects multiple statements", () => {
+    expect(
+      sqlSafetySchema.safeParse("SELECT 1; DROP TABLE vessels").success,
+    ).toBe(false);
   });
 });
 
-describe('positionSchema', () => {
-  it('validates correct position data', () => {
+describe("positionSchema", () => {
+  it("validates correct position data", () => {
     const result = positionSchema.safeParse({
-      mmsi: '123456789',
+      mmsi: "123456789",
       longitude: 0.11,
       latitude: 49.49,
       speed: 12.5,
       heading: 180,
       course: 175,
-      timestamp: '2026-03-30T12:00:00Z',
+      timestamp: "2026-03-30T12:00:00Z",
     });
     expect(result.success).toBe(true);
   });
 
-  it('rejects invalid MMSI', () => {
+  it("rejects invalid MMSI", () => {
     const result = positionSchema.safeParse({
-      mmsi: '12345',
+      mmsi: "12345",
       longitude: 0.11,
       latitude: 49.49,
       speed: null,
@@ -515,28 +568,32 @@ describe('positionSchema', () => {
   });
 });
 
-describe('nlqRequestSchema', () => {
-  it('rejects queries shorter than 3 characters', () => {
-    expect(nlqRequestSchema.safeParse({ query: 'ab' }).success).toBe(false);
+describe("nlqRequestSchema", () => {
+  it("rejects queries shorter than 3 characters", () => {
+    expect(nlqRequestSchema.safeParse({ query: "ab" }).success).toBe(false);
   });
 
-  it('accepts valid queries', () => {
-    expect(nlqRequestSchema.safeParse({ query: 'Show me all tankers' }).success).toBe(true);
+  it("accepts valid queries", () => {
+    expect(
+      nlqRequestSchema.safeParse({ query: "Show me all tankers" }).success,
+    ).toBe(true);
   });
 });
 ```
 
 - [ ] **Step 2:** Run test — expect FAIL
+
 ```bash
 npm test -- --run src/lib/__tests__/schemas.test.ts
 ```
 
 - [ ] **Step 3:** Create `src/lib/schemas.ts`
+
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 export const vesselSchema = z.object({
-  mmsi: z.string().regex(/^\d{9}$/, 'MMSI must be 9 digits'),
+  mmsi: z.string().regex(/^\d{9}$/, "MMSI must be 9 digits"),
   name: z.string().nullable(),
   vesselType: z.string().nullable(),
   flag: z.string().nullable(),
@@ -570,18 +627,27 @@ export const weatherReadingSchema = z.object({
   temperature: z.number().nullable(),
 });
 
-export const sqlSafetySchema = z.string()
-  .refine((sql) => /^SELECT\s/i.test(sql.trim()), 'Only SELECT queries allowed')
-  .refine((sql) => !/\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|GRANT|REVOKE)\b/i.test(sql), 'DDL/DML statements not allowed')
-  .refine((sql) => !/;\s*\S/.test(sql), 'Multiple statements not allowed');
+export const sqlSafetySchema = z
+  .string()
+  .refine((sql) => /^SELECT\s/i.test(sql.trim()), "Only SELECT queries allowed")
+  .refine(
+    (sql) =>
+      !/\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|GRANT|REVOKE)\b/i.test(
+        sql,
+      ),
+    "DDL/DML statements not allowed",
+  )
+  .refine((sql) => !/;\s*\S/.test(sql), "Multiple statements not allowed");
 ```
 
 - [ ] **Step 4:** Run test — expect PASS
+
 ```bash
 npm test -- --run src/lib/__tests__/schemas.test.ts
 ```
 
 - [ ] **Step 5:** Commit
+
 ```bash
 git add src/lib/schemas.ts src/lib/__tests__/schemas.test.ts && git commit -m "feat: add Zod validation schemas with SQL safety checks"
 ```
@@ -591,9 +657,11 @@ git add src/lib/schemas.ts src/lib/__tests__/schemas.test.ts && git commit -m "f
 ### Task 1.8: Create environment variables template
 
 **Files:**
+
 - Create: `.env.example`
 
 - [ ] **Step 1:** Create `.env.example`
+
 ```
 # Database
 DATABASE_URL=postgresql://lehavre:${POSTGRES_PASSWORD}@localhost:5432/lehavre_port
@@ -617,6 +685,7 @@ NODE_ENV=development
 - [ ] **Step 2:** Verify `.env` is in `.gitignore`
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add .env.example && git commit -m "chore: add environment variables template"
 ```
@@ -626,6 +695,7 @@ git add .env.example && git commit -m "chore: add environment variables template
 ### Task 1.9: Create Docker Compose configuration
 
 **Files:**
+
 - Create: `docker-compose.yml`
 - Create: `docker-compose.dev.yml`
 - Create: `Caddyfile`
@@ -633,6 +703,7 @@ git add .env.example && git commit -m "chore: add environment variables template
 - Modify: `next.config.ts` (add `output: 'standalone'`)
 
 - [ ] **Step 1:** Create `docker-compose.yml`
+
 ```yaml
 services:
   caddy:
@@ -719,6 +790,7 @@ volumes:
 ```
 
 - [ ] **Step 2:** Create `docker-compose.dev.yml` (DB only for local dev)
+
 ```yaml
 services:
   db:
@@ -744,6 +816,7 @@ volumes:
 ```
 
 - [ ] **Step 3:** Create `Caddyfile`
+
 ```
 {$DOMAIN:localhost} {
   reverse_proxy app:3000
@@ -755,6 +828,7 @@ n8n.{$DOMAIN:localhost} {
 ```
 
 - [ ] **Step 4:** Create `Dockerfile`
+
 ```dockerfile
 FROM node:20-alpine AS base
 
@@ -789,6 +863,7 @@ CMD ["node", "server.js"]
 - [ ] **Step 6:** Verify syntax: `docker compose -f docker-compose.dev.yml config`
 
 - [ ] **Step 7:** Commit
+
 ```bash
 git add docker-compose.yml docker-compose.dev.yml Caddyfile Dockerfile next.config.ts && git commit -m "chore: add Docker Compose configuration for all services"
 ```
@@ -800,9 +875,11 @@ git add docker-compose.yml docker-compose.dev.yml Caddyfile Dockerfile next.conf
 ### Task 2.1: Create database initialization script
 
 **Files:**
+
 - Create: `scripts/init-db.sql`
 
 - [ ] **Step 1:** Create `scripts/init-db.sql`
+
 ```sql
 -- Enable PostGIS
 CREATE EXTENSION IF NOT EXISTS postgis;
@@ -818,21 +895,25 @@ CREATE DATABASE n8n;
 ```
 
 - [ ] **Step 2:** Start dev DB
+
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
 
 - [ ] **Step 3:** Verify PostGIS
+
 ```bash
 docker compose -f docker-compose.dev.yml exec db psql -U lehavre -d lehavre_port -c "SELECT PostGIS_Version();"
 ```
 
 - [ ] **Step 4:** Verify read-only role
+
 ```bash
 docker compose -f docker-compose.dev.yml exec db psql -U lehavre -d lehavre_port -c "\du lehavre_readonly"
 ```
 
 - [ ] **Step 5:** Commit
+
 ```bash
 git add scripts/init-db.sql && git commit -m "feat: add database initialization script with PostGIS and read-only role"
 ```
@@ -842,18 +923,20 @@ git add scripts/init-db.sql && git commit -m "feat: add database initialization 
 ### Task 2.2: Configure Drizzle ORM
 
 **Files:**
+
 - Create: `drizzle.config.ts`
 - Create: `src/lib/db.ts`
 
 - [ ] **Step 1:** Create `drizzle.config.ts`
+
 ```typescript
-import 'dotenv/config';
-import { defineConfig } from 'drizzle-kit';
+import "dotenv/config";
+import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  out: './drizzle',
-  schema: './src/lib/schema.ts',
-  dialect: 'postgresql',
+  out: "./drizzle",
+  schema: "./src/lib/schema.ts",
+  dialect: "postgresql",
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
@@ -861,10 +944,11 @@ export default defineConfig({
 ```
 
 - [ ] **Step 2:** Create `src/lib/db.ts`
+
 ```typescript
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-import * as schema from './schema';
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import * as schema from "./schema";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -881,6 +965,7 @@ export const dbReadonly = drizzle(readonlyPool, { schema });
 ```
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add drizzle.config.ts src/lib/db.ts && git commit -m "feat: configure Drizzle ORM with read-only connection for NLQ"
 ```
@@ -890,9 +975,11 @@ git add drizzle.config.ts src/lib/db.ts && git commit -m "feat: configure Drizzl
 ### Task 2.3: Define Drizzle schema
 
 **Files:**
+
 - Create: `src/lib/schema.ts`
 
 - [ ] **Step 1:** Create `src/lib/schema.ts`
+
 ```typescript
 import {
   pgTable,
@@ -904,15 +991,15 @@ import {
   date,
   jsonb,
   index,
-} from 'drizzle-orm/pg-core';
-import { customType } from 'drizzle-orm/pg-core';
+} from "drizzle-orm/pg-core";
+import { customType } from "drizzle-orm/pg-core";
 
 const geometry = customType<{
   data: { longitude: number; latitude: number };
   driverData: string;
 }>({
   dataType() {
-    return 'GEOMETRY(Point, 4326)';
+    return "GEOMETRY(Point, 4326)";
   },
   toDriver(value) {
     return `SRID=4326;POINT(${value.longitude} ${value.latitude})`;
@@ -924,80 +1011,95 @@ const geometry = customType<{
   },
 });
 
-export const vessels = pgTable('vessels', {
-  mmsi: text('mmsi').primaryKey(),
-  name: text('name'),
-  vesselType: text('vessel_type'),
-  flag: text('flag'),
-  length: real('length'),
-  width: real('width'),
-  destination: text('destination'),
-  firstSeen: timestamp('first_seen', { withTimezone: true }).notNull(),
-  lastSeen: timestamp('last_seen', { withTimezone: true }).notNull(),
+export const vessels = pgTable("vessels", {
+  mmsi: text("mmsi").primaryKey(),
+  name: text("name"),
+  vesselType: text("vessel_type"),
+  flag: text("flag"),
+  length: real("length"),
+  width: real("width"),
+  destination: text("destination"),
+  firstSeen: timestamp("first_seen", { withTimezone: true }).notNull(),
+  lastSeen: timestamp("last_seen", { withTimezone: true }).notNull(),
 });
 
-export const positions = pgTable('positions', {
-  id: bigserial('id', { mode: 'number' }).primaryKey(),
-  mmsi: text('mmsi').notNull().references(() => vessels.mmsi),
-  position: geometry('position').notNull(),
-  speed: real('speed'),
-  heading: real('heading'),
-  course: real('course'),
-  timestamp: timestamp('timestamp', { withTimezone: true }).notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-}, (table) => [
-  index('idx_positions_timestamp').on(table.timestamp),
-  index('idx_positions_mmsi').on(table.mmsi),
-  index('idx_positions_geo').using('gist', table.position),
-]);
+export const positions = pgTable(
+  "positions",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    mmsi: text("mmsi")
+      .notNull()
+      .references(() => vessels.mmsi),
+    position: geometry("position").notNull(),
+    speed: real("speed"),
+    heading: real("heading"),
+    course: real("course"),
+    timestamp: timestamp("timestamp", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    index("idx_positions_timestamp").on(table.timestamp),
+    index("idx_positions_mmsi").on(table.mmsi),
+    index("idx_positions_geo").using("gist", table.position),
+  ],
+);
 
-export const weatherReadings = pgTable('weather_readings', {
-  id: serial('id').primaryKey(),
-  timestamp: timestamp('timestamp', { withTimezone: true }).notNull(),
-  windSpeed: real('wind_speed'),
-  windDirection: real('wind_direction'),
-  waveHeight: real('wave_height'),
-  visibility: real('visibility'),
-  temperature: real('temperature'),
-  rawData: jsonb('raw_data'),
-}, (table) => [
-  index('idx_weather_timestamp').on(table.timestamp),
-]);
+export const weatherReadings = pgTable(
+  "weather_readings",
+  {
+    id: serial("id").primaryKey(),
+    timestamp: timestamp("timestamp", { withTimezone: true }).notNull(),
+    windSpeed: real("wind_speed"),
+    windDirection: real("wind_direction"),
+    waveHeight: real("wave_height"),
+    visibility: real("visibility"),
+    temperature: real("temperature"),
+    rawData: jsonb("raw_data"),
+  },
+  (table) => [index("idx_weather_timestamp").on(table.timestamp)],
+);
 
-export const dailySummaries = pgTable('daily_summaries', {
-  id: serial('id').primaryKey(),
-  date: date('date').unique().notNull(),
-  summary: text('summary').notNull(),
-  notableEvents: jsonb('notable_events').$type<Array<{
-    title: string;
-    description: string;
-    type: string;
-  }>>(),
-  generatedAt: timestamp('generated_at', { withTimezone: true }).defaultNow(),
+export const dailySummaries = pgTable("daily_summaries", {
+  id: serial("id").primaryKey(),
+  date: date("date").unique().notNull(),
+  summary: text("summary").notNull(),
+  notableEvents: jsonb("notable_events").$type<
+    Array<{
+      title: string;
+      description: string;
+      type: string;
+    }>
+  >(),
+  generatedAt: timestamp("generated_at", { withTimezone: true }).defaultNow(),
 });
 ```
 
 - [ ] **Step 2:** Generate migration
+
 ```bash
 npx drizzle-kit generate
 ```
 
 - [ ] **Step 3:** Push schema to dev DB
+
 ```bash
 npx drizzle-kit push
 ```
 
 - [ ] **Step 4:** Verify tables
+
 ```bash
 docker compose -f docker-compose.dev.yml exec db psql -U lehavre -d lehavre_port -c "\dt"
 ```
 
 - [ ] **Step 5:** Verify spatial index
+
 ```bash
 docker compose -f docker-compose.dev.yml exec db psql -U lehavre -d lehavre_port -c "\di idx_positions_geo"
 ```
 
 - [ ] **Step 6:** Commit
+
 ```bash
 git add src/lib/schema.ts drizzle/ && git commit -m "feat: define Drizzle schema with PostGIS geometry and spatial index"
 ```
@@ -1009,6 +1111,7 @@ git add src/lib/schema.ts drizzle/ && git commit -m "feat: define Drizzle schema
 Instead of a single `db-utils.ts`, queries are split by domain into `src/lib/queries/`.
 
 **Files:**
+
 - Create: `src/lib/queries/vessels.ts` (~50 lines) — vessel + position spatial queries
 - Create: `src/lib/queries/weather.ts` (~25 lines) — weather queries
 - Create: `src/lib/queries/summaries.ts` (~25 lines) — daily summary queries
@@ -1017,10 +1120,11 @@ Instead of a single `db-utils.ts`, queries are split by domain into `src/lib/que
 - Create: `src/lib/queries/index.ts` — barrel re-export
 
 - [ ] **Step 1:** Create `src/lib/queries/vessels.ts`
+
 ```typescript
-import { db } from '../db';
-import { sql } from 'drizzle-orm';
-import { PORT_CONFIG } from '../constants';
+import { db } from "../db";
+import { sql } from "drizzle-orm";
+import { PORT_CONFIG } from "../constants";
 
 const BBOX = PORT_CONFIG.boundingBox;
 
@@ -1039,11 +1143,15 @@ const VESSELS_IN_ZONE_BASE = sql`
 `;
 
 export async function getVesselsInZone() {
-  return db.execute(sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > NOW() - INTERVAL '1 hour' ORDER BY v.mmsi, p.timestamp DESC`);
+  return db.execute(
+    sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > NOW() - INTERVAL '1 hour' ORDER BY v.mmsi, p.timestamp DESC`,
+  );
 }
 
 export async function getPositionsSince(since: string) {
-  return db.execute(sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > ${since}::timestamptz ORDER BY v.mmsi, p.timestamp DESC`);
+  return db.execute(
+    sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > ${since}::timestamptz ORDER BY v.mmsi, p.timestamp DESC`,
+  );
 }
 
 export async function getTrafficTimeline(hours: number = 24) {
@@ -1058,41 +1166,62 @@ export async function getTrafficTimeline(hours: number = 24) {
 ```
 
 - [ ] **Step 2:** Create `src/lib/queries/weather.ts`
+
 ```typescript
-import { db } from '../db';
-import { weatherReadings } from '../schema';
-import { desc, gte, sql } from 'drizzle-orm';
+import { db } from "../db";
+import { weatherReadings } from "../schema";
+import { desc, gte, sql } from "drizzle-orm";
 
 export async function getLatestWeather() {
-  return db.select().from(weatherReadings).orderBy(desc(weatherReadings.timestamp)).limit(1);
+  return db
+    .select()
+    .from(weatherReadings)
+    .orderBy(desc(weatherReadings.timestamp))
+    .limit(1);
 }
 
 export async function getWeatherHistory(hours: number = 24) {
-  return db.select().from(weatherReadings)
-    .where(gte(weatherReadings.timestamp, sql`NOW() - INTERVAL '${sql.raw(String(hours))} hours'`))
+  return db
+    .select()
+    .from(weatherReadings)
+    .where(
+      gte(
+        weatherReadings.timestamp,
+        sql`NOW() - INTERVAL '${sql.raw(String(hours))} hours'`,
+      ),
+    )
     .orderBy(weatherReadings.timestamp);
 }
 ```
 
 - [ ] **Step 3:** Create `src/lib/queries/summaries.ts`
+
 ```typescript
-import { db } from '../db';
-import { dailySummaries } from '../schema';
-import { eq, desc } from 'drizzle-orm';
+import { db } from "../db";
+import { dailySummaries } from "../schema";
+import { eq, desc } from "drizzle-orm";
 
 export async function getLatestSummary() {
-  return db.select().from(dailySummaries).orderBy(desc(dailySummaries.date)).limit(1);
+  return db
+    .select()
+    .from(dailySummaries)
+    .orderBy(desc(dailySummaries.date))
+    .limit(1);
 }
 
 export async function getSummaryByDate(dateStr: string) {
-  return db.select().from(dailySummaries).where(eq(dailySummaries.date, dateStr));
+  return db
+    .select()
+    .from(dailySummaries)
+    .where(eq(dailySummaries.date, dateStr));
 }
 ```
 
 - [ ] **Step 4:** Create `src/lib/queries/nlq.ts`
+
 ```typescript
-import { dbReadonly } from '../db';
-import { sql } from 'drizzle-orm';
+import { dbReadonly } from "../db";
+import { sql } from "drizzle-orm";
 
 export async function executeNlqQuery(sqlQuery: string) {
   return dbReadonly.execute(sql.raw(sqlQuery));
@@ -1100,10 +1229,11 @@ export async function executeNlqQuery(sqlQuery: string) {
 ```
 
 - [ ] **Step 5:** Create `src/lib/queries/kpi.ts`
+
 ```typescript
-import { db } from '../db';
-import { sql } from 'drizzle-orm';
-import { PORT_CONFIG } from '../constants';
+import { db } from "../db";
+import { sql } from "drizzle-orm";
+import { PORT_CONFIG } from "../constants";
 
 const BBOX = PORT_CONFIG.boundingBox;
 
@@ -1121,15 +1251,21 @@ export async function getKpiMetrics() {
 ```
 
 - [ ] **Step 6:** Create `src/lib/queries/index.ts`
+
 ```typescript
-export { getVesselsInZone, getPositionsSince, getTrafficTimeline } from './vessels';
-export { getLatestWeather, getWeatherHistory } from './weather';
-export { getLatestSummary, getSummaryByDate } from './summaries';
-export { executeNlqQuery } from './nlq';
-export { getKpiMetrics } from './kpi';
+export {
+  getVesselsInZone,
+  getPositionsSince,
+  getTrafficTimeline,
+} from "./vessels";
+export { getLatestWeather, getWeatherHistory } from "./weather";
+export { getLatestSummary, getSummaryByDate } from "./summaries";
+export { executeNlqQuery } from "./nlq";
+export { getKpiMetrics } from "./kpi";
 ```
 
 - [ ] **Step 7:** Commit
+
 ```bash
 git add src/lib/queries/ && git commit -m "feat: add query modules split by domain (vessels, weather, summaries, nlq, kpi)"
 ```
@@ -1141,11 +1277,13 @@ git add src/lib/queries/ && git commit -m "feat: add query modules split by doma
 ### Task 3.1: Scaffold AIS worker
 
 **Files:**
+
 - Create: `src/workers/ais-collector/package.json`
 - Create: `src/workers/ais-collector/tsconfig.json`
 - Create: `src/workers/ais-collector/Dockerfile`
 
 - [ ] **Step 1:** Create `src/workers/ais-collector/package.json`
+
 ```json
 {
   "name": "ais-collector",
@@ -1171,6 +1309,7 @@ git add src/lib/queries/ && git commit -m "feat: add query modules split by doma
 ```
 
 - [ ] **Step 2:** Create `src/workers/ais-collector/tsconfig.json`
+
 ```json
 {
   "compilerOptions": {
@@ -1187,6 +1326,7 @@ git add src/lib/queries/ && git commit -m "feat: add query modules split by doma
 ```
 
 - [ ] **Step 3:** Create `src/workers/ais-collector/Dockerfile`
+
 ```dockerfile
 FROM node:20-alpine
 WORKDIR /app
@@ -1197,11 +1337,13 @@ CMD ["node", "--loader", "tsx", "index.ts"]
 ```
 
 - [ ] **Step 4:** Install deps
+
 ```bash
 cd src/workers/ais-collector && npm install && cd ../../..
 ```
 
 - [ ] **Step 5:** Commit
+
 ```bash
 git add src/workers/ais-collector/ && git commit -m "chore: scaffold AIS collector worker package"
 ```
@@ -1211,62 +1353,73 @@ git add src/workers/ais-collector/ && git commit -m "chore: scaffold AIS collect
 ### Task 3.2: Implement AIS message parser
 
 **Files:**
+
 - Create: `src/workers/ais-collector/parser.ts`
 - Create: `src/workers/ais-collector/parser.test.ts`
 
 - [ ] **Step 1:** Write test `src/workers/ais-collector/parser.test.ts`
+
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { parseAisMessage, isPositionReport, isStaticData } from './parser';
+import { describe, it, expect } from "vitest";
+import { parseAisMessage, isPositionReport, isStaticData } from "./parser";
 
 const POSITION_MSG = JSON.stringify({
-  MessageType: 'PositionReport',
-  MetaData: { MMSI: 123456789, ShipName: 'TEST VESSEL', time_utc: '2026-03-30T12:00:00Z' },
+  MessageType: "PositionReport",
+  MetaData: {
+    MMSI: 123456789,
+    ShipName: "TEST VESSEL",
+    time_utc: "2026-03-30T12:00:00Z",
+  },
   Message: {
     PositionReport: {
-      Sog: 125, Cog: 1800, TrueHeading: 180,
-      Longitude: 0.11, Latitude: 49.49,
+      Sog: 125,
+      Cog: 1800,
+      TrueHeading: 180,
+      Longitude: 0.11,
+      Latitude: 49.49,
     },
   },
 });
 
 const STATIC_MSG = JSON.stringify({
-  MessageType: 'ShipStaticData',
-  MetaData: { MMSI: 123456789, time_utc: '2026-03-30T12:00:00Z' },
+  MessageType: "ShipStaticData",
+  MetaData: { MMSI: 123456789, time_utc: "2026-03-30T12:00:00Z" },
   Message: {
     ShipStaticData: {
-      Name: 'TEST VESSEL', Type: 70, Destination: 'ANTWERP@@@@',
+      Name: "TEST VESSEL",
+      Type: 70,
+      Destination: "ANTWERP@@@@",
       Dimension: { A: 100, B: 50, C: 15, D: 15 },
     },
   },
 });
 
-describe('parseAisMessage', () => {
-  it('parses a PositionReport', () => {
+describe("parseAisMessage", () => {
+  it("parses a PositionReport", () => {
     const result = parseAisMessage(POSITION_MSG);
     expect(result).not.toBeNull();
     expect(isPositionReport(result!)).toBe(true);
     if (isPositionReport(result!)) {
-      expect(result.mmsi).toBe('123456789');
+      expect(result.mmsi).toBe("123456789");
       expect(result.speed).toBe(12.5);
       expect(result.heading).toBe(180);
       expect(result.course).toBe(180);
     }
   });
 
-  it('parses ShipStaticData', () => {
+  it("parses ShipStaticData", () => {
     const result = parseAisMessage(STATIC_MSG);
     expect(result).not.toBeNull();
     expect(isStaticData(result!)).toBe(true);
     if (isStaticData(result!)) {
-      expect(result.name).toBe('TEST VESSEL');
-      expect(result.destination).toBe('ANTWERP');
+      expect(result.name).toBe("TEST VESSEL");
+      expect(result.destination).toBe("ANTWERP");
       expect(result.length).toBe(150);
       expect(result.width).toBe(30);
     }
   });
 
-  it('handles heading 511 as null', () => {
+  it("handles heading 511 as null", () => {
     const msg = JSON.parse(POSITION_MSG);
     msg.Message.PositionReport.TrueHeading = 511;
     const result = parseAisMessage(JSON.stringify(msg));
@@ -1275,25 +1428,31 @@ describe('parseAisMessage', () => {
     }
   });
 
-  it('returns null for malformed JSON', () => {
-    expect(parseAisMessage('not json')).toBeNull();
+  it("returns null for malformed JSON", () => {
+    expect(parseAisMessage("not json")).toBeNull();
   });
 
-  it('returns null for unsupported message types', () => {
-    const msg = JSON.stringify({ MessageType: 'BaseStationReport', MetaData: { MMSI: 1, time_utc: '' }, Message: {} });
+  it("returns null for unsupported message types", () => {
+    const msg = JSON.stringify({
+      MessageType: "BaseStationReport",
+      MetaData: { MMSI: 1, time_utc: "" },
+      Message: {},
+    });
     expect(parseAisMessage(msg)).toBeNull();
   });
 });
 ```
 
 - [ ] **Step 2:** Run test — expect FAIL
+
 ```bash
 npx vitest run src/workers/ais-collector/parser.test.ts
 ```
 
 - [ ] **Step 3:** Create `src/workers/ais-collector/parser.ts`
+
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const metadataSchema = z.object({
   MMSI: z.number(),
@@ -1354,12 +1513,14 @@ export interface ParsedStaticData {
   timestamp: Date;
 }
 
-export function parseAisMessage(raw: string): ParsedPosition | ParsedStaticData | null {
+export function parseAisMessage(
+  raw: string,
+): ParsedPosition | ParsedStaticData | null {
   try {
     const data = JSON.parse(raw);
     const parsed = aisMessageSchema.parse(data);
 
-    if (parsed.MessageType === 'PositionReport') {
+    if (parsed.MessageType === "PositionReport") {
       const report = positionReportSchema.parse(parsed.Message.PositionReport);
       return {
         mmsi: String(parsed.MetaData.MMSI),
@@ -1373,8 +1534,10 @@ export function parseAisMessage(raw: string): ParsedPosition | ParsedStaticData 
       };
     }
 
-    if (parsed.MessageType === 'ShipStaticData') {
-      const staticData = shipStaticDataSchema.parse(parsed.Message.ShipStaticData);
+    if (parsed.MessageType === "ShipStaticData") {
+      const staticData = shipStaticDataSchema.parse(
+        parsed.Message.ShipStaticData,
+      );
       const dim = staticData.Dimension;
       return {
         mmsi: String(parsed.MetaData.MMSI),
@@ -1382,7 +1545,8 @@ export function parseAisMessage(raw: string): ParsedPosition | ParsedStaticData 
         vesselType: staticData.Type,
         callSign: staticData.CallSign?.trim() || null,
         imoNumber: staticData.ImoNumber || null,
-        destination: staticData.Destination?.trim().replace(/@+/g, '').trim() || null,
+        destination:
+          staticData.Destination?.trim().replace(/@+/g, "").trim() || null,
         length: dim ? dim.A + dim.B : null,
         width: dim ? dim.C + dim.D : null,
         timestamp: new Date(parsed.MetaData.time_utc),
@@ -1395,21 +1559,27 @@ export function parseAisMessage(raw: string): ParsedPosition | ParsedStaticData 
   }
 }
 
-export function isPositionReport(msg: ParsedPosition | ParsedStaticData): msg is ParsedPosition {
-  return 'longitude' in msg && 'speed' in msg;
+export function isPositionReport(
+  msg: ParsedPosition | ParsedStaticData,
+): msg is ParsedPosition {
+  return "longitude" in msg && "speed" in msg;
 }
 
-export function isStaticData(msg: ParsedPosition | ParsedStaticData): msg is ParsedStaticData {
-  return 'vesselType' in msg;
+export function isStaticData(
+  msg: ParsedPosition | ParsedStaticData,
+): msg is ParsedStaticData {
+  return "vesselType" in msg;
 }
 ```
 
 - [ ] **Step 4:** Run test — expect PASS
+
 ```bash
 npx vitest run src/workers/ais-collector/parser.test.ts
 ```
 
 - [ ] **Step 5:** Commit
+
 ```bash
 git add src/workers/ais-collector/parser.ts src/workers/ais-collector/parser.test.ts && git commit -m "feat: implement AIS message parser with Zod validation"
 ```
@@ -1419,70 +1589,78 @@ git add src/workers/ais-collector/parser.ts src/workers/ais-collector/parser.tes
 ### Task 3.3: Implement AIS worker (split into 3 files)
 
 **Files:**
+
 - Create: `src/workers/ais-collector/db-operations.ts` (~60 lines) — DB upsert/insert + vessel category mapping
 - Create: `src/workers/ais-collector/db-operations.test.ts` — unit test for getVesselCategory
 - Create: `src/workers/ais-collector/connection.ts` (~50 lines) — WebSocket connect/reconnect logic
 - Create: `src/workers/ais-collector/index.ts` (~15 lines) — entry point wiring
 
 - [ ] **Step 1:** Write test `src/workers/ais-collector/db-operations.test.ts`
+
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { getVesselCategory } from './db-operations';
+import { describe, it, expect } from "vitest";
+import { getVesselCategory } from "./db-operations";
 
-describe('getVesselCategory', () => {
-  it('maps cargo codes (70-79) to Cargo', () => {
-    expect(getVesselCategory(70)).toBe('Cargo');
-    expect(getVesselCategory(75)).toBe('Cargo');
+describe("getVesselCategory", () => {
+  it("maps cargo codes (70-79) to Cargo", () => {
+    expect(getVesselCategory(70)).toBe("Cargo");
+    expect(getVesselCategory(75)).toBe("Cargo");
   });
 
-  it('maps tanker codes (80-89) to Tanker', () => {
-    expect(getVesselCategory(80)).toBe('Tanker');
+  it("maps tanker codes (80-89) to Tanker", () => {
+    expect(getVesselCategory(80)).toBe("Tanker");
   });
 
-  it('maps passenger codes (60-69) to Passenger', () => {
-    expect(getVesselCategory(60)).toBe('Passenger');
+  it("maps passenger codes (60-69) to Passenger", () => {
+    expect(getVesselCategory(60)).toBe("Passenger");
   });
 
-  it('maps fishing code 30 to Fishing', () => {
-    expect(getVesselCategory(30)).toBe('Fishing');
+  it("maps fishing code 30 to Fishing", () => {
+    expect(getVesselCategory(30)).toBe("Fishing");
   });
 
-  it('maps unknown codes to Other', () => {
-    expect(getVesselCategory(99)).toBe('Other');
-    expect(getVesselCategory(0)).toBe('Other');
+  it("maps unknown codes to Other", () => {
+    expect(getVesselCategory(99)).toBe("Other");
+    expect(getVesselCategory(0)).toBe("Other");
   });
 });
 ```
 
 - [ ] **Step 2:** Run test — expect FAIL
+
 ```bash
 npx vitest run src/workers/ais-collector/db-operations.test.ts
 ```
 
 - [ ] **Step 3:** Create `src/workers/ais-collector/db-operations.ts`
+
 ```typescript
-import { Pool } from 'pg';
-import type { ParsedPosition, ParsedStaticData } from './parser.js';
+import { Pool } from "pg";
+import type { ParsedPosition, ParsedStaticData } from "./parser.js";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 export function getVesselCategory(typeCode: number): string {
-  if (typeCode >= 70 && typeCode <= 79) return 'Cargo';
-  if (typeCode >= 80 && typeCode <= 89) return 'Tanker';
-  if (typeCode >= 60 && typeCode <= 69) return 'Passenger';
-  if (typeCode === 30) return 'Fishing';
-  if (typeCode === 52) return 'Tug';
-  if (typeCode >= 40 && typeCode <= 49) return 'High Speed Craft';
-  return 'Other';
+  if (typeCode >= 70 && typeCode <= 79) return "Cargo";
+  if (typeCode >= 80 && typeCode <= 89) return "Tanker";
+  if (typeCode >= 60 && typeCode <= 69) return "Passenger";
+  if (typeCode === 30) return "Fishing";
+  if (typeCode === 52) return "Tug";
+  if (typeCode >= 40 && typeCode <= 49) return "High Speed Craft";
+  return "Other";
 }
 
-export async function upsertVesselFromPosition(mmsi: string, shipName: string | null, timestamp: Date) {
+export async function upsertVesselFromPosition(
+  mmsi: string,
+  shipName: string | null,
+  timestamp: Date,
+) {
   await pool.query(
     `INSERT INTO vessels (mmsi, name, first_seen, last_seen) VALUES ($1, $2, $3, $3)
      ON CONFLICT (mmsi) DO UPDATE SET
        name = COALESCE(EXCLUDED.name, vessels.name),
        last_seen = GREATEST(EXCLUDED.last_seen, vessels.last_seen)`,
-    [mmsi, shipName, timestamp]
+    [mmsi, shipName, timestamp],
   );
 }
 
@@ -1498,7 +1676,15 @@ export async function upsertVesselFromStatic(data: ParsedStaticData) {
        length = COALESCE(EXCLUDED.length, vessels.length),
        width = COALESCE(EXCLUDED.width, vessels.width),
        last_seen = GREATEST(EXCLUDED.last_seen, vessels.last_seen)`,
-    [data.mmsi, data.name, typeCategory, data.destination, data.length, data.width, data.timestamp]
+    [
+      data.mmsi,
+      data.name,
+      typeCategory,
+      data.destination,
+      data.length,
+      data.width,
+      data.timestamp,
+    ],
   );
 }
 
@@ -1506,79 +1692,105 @@ export async function insertPosition(data: ParsedPosition) {
   await pool.query(
     `INSERT INTO positions (mmsi, position, speed, heading, course, timestamp)
      VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), 4326), $4, $5, $6, $7)`,
-    [data.mmsi, data.longitude, data.latitude, data.speed, data.heading, data.course, data.timestamp]
+    [
+      data.mmsi,
+      data.longitude,
+      data.latitude,
+      data.speed,
+      data.heading,
+      data.course,
+      data.timestamp,
+    ],
   );
 }
 ```
 
 - [ ] **Step 4:** Run test — expect PASS
+
 ```bash
 npx vitest run src/workers/ais-collector/db-operations.test.ts
 ```
 
 - [ ] **Step 5:** Create `src/workers/ais-collector/connection.ts`
-```typescript
-import WebSocket from 'ws';
-import { parseAisMessage, isPositionReport, isStaticData } from './parser.js';
-import { upsertVesselFromPosition, upsertVesselFromStatic, insertPosition } from './db-operations.js';
 
-const AIS_WS_URL = 'wss://stream.aisstream.io/v0/stream';
+```typescript
+import WebSocket from "ws";
+import { parseAisMessage, isPositionReport, isStaticData } from "./parser.js";
+import {
+  upsertVesselFromPosition,
+  upsertVesselFromStatic,
+  insertPosition,
+} from "./db-operations.js";
+
+const AIS_WS_URL = "wss://stream.aisstream.io/v0/stream";
 const RECONNECT_DELAY_MS = 5000;
 
 const BOUNDING_BOX = {
-  min: { latitude: 49.40, longitude: -0.15 },
-  max: { latitude: 49.55, longitude: 0.40 },
+  min: { latitude: 49.4, longitude: -0.15 },
+  max: { latitude: 49.55, longitude: 0.4 },
 };
 
 export function connect() {
-  console.log('[AIS] Connecting to AISstream...');
+  console.log("[AIS] Connecting to AISstream...");
   const ws = new WebSocket(AIS_WS_URL);
 
-  ws.on('open', () => {
-    console.log('[AIS] Connected. Sending subscription...');
-    ws.send(JSON.stringify({
-      APIKey: process.env.AISSTREAM_API_KEY,
-      BoundingBoxes: [[
-        [BOUNDING_BOX.min.latitude, BOUNDING_BOX.min.longitude],
-        [BOUNDING_BOX.max.latitude, BOUNDING_BOX.max.longitude],
-      ]],
-      FilterMessageTypes: ['PositionReport', 'ShipStaticData'],
-    }));
+  ws.on("open", () => {
+    console.log("[AIS] Connected. Sending subscription...");
+    ws.send(
+      JSON.stringify({
+        APIKey: process.env.AISSTREAM_API_KEY,
+        BoundingBoxes: [
+          [
+            [BOUNDING_BOX.min.latitude, BOUNDING_BOX.min.longitude],
+            [BOUNDING_BOX.max.latitude, BOUNDING_BOX.max.longitude],
+          ],
+        ],
+        FilterMessageTypes: ["PositionReport", "ShipStaticData"],
+      }),
+    );
   });
 
-  ws.on('message', async (data: Buffer) => {
+  ws.on("message", async (data: Buffer) => {
     const parsed = parseAisMessage(data.toString());
     if (!parsed) return;
 
     try {
       if (isPositionReport(parsed)) {
-        await upsertVesselFromPosition(parsed.mmsi, parsed.shipName, parsed.timestamp);
+        await upsertVesselFromPosition(
+          parsed.mmsi,
+          parsed.shipName,
+          parsed.timestamp,
+        );
         await insertPosition(parsed);
       } else if (isStaticData(parsed)) {
         await upsertVesselFromStatic(parsed);
       }
     } catch (err) {
-      console.error('[AIS] DB write error:', err);
+      console.error("[AIS] DB write error:", err);
     }
   });
 
-  ws.on('error', (err) => console.error('[AIS] WebSocket error:', err.message));
-  ws.on('close', (code) => {
-    console.log(`[AIS] Closed (${code}). Reconnecting in ${RECONNECT_DELAY_MS}ms...`);
+  ws.on("error", (err) => console.error("[AIS] WebSocket error:", err.message));
+  ws.on("close", (code) => {
+    console.log(
+      `[AIS] Closed (${code}). Reconnecting in ${RECONNECT_DELAY_MS}ms...`,
+    );
     setTimeout(connect, RECONNECT_DELAY_MS);
   });
 }
 ```
 
 - [ ] **Step 6:** Create `src/workers/ais-collector/index.ts`
+
 ```typescript
-import { connect } from './connection.js';
+import { connect } from "./connection.js";
 
 connect();
-console.log('[AIS] Worker started.');
+console.log("[AIS] Worker started.");
 ```
 
 - [ ] **Step 7:** Commit
+
 ```bash
 git add src/workers/ais-collector/ && git commit -m "feat: implement AIS WebSocket collector (SoC split: db-operations, connection, entry)"
 ```
@@ -1590,10 +1802,12 @@ git add src/workers/ais-collector/ && git commit -m "feat: implement AIS WebSock
 ### Task 4.1: Create TanStack Query provider
 
 **Files:**
+
 - Create: `src/components/providers.tsx`
 - Modify: `src/app/layout.tsx`
 
 - [ ] **Step 1:** Create `src/components/providers.tsx`
+
 ```typescript
 'use client';
 
@@ -1630,6 +1844,7 @@ export const Providers = ({ children }: ProvidersProps) => {
 - [ ] **Step 2:** Wrap children in `src/app/layout.tsx` with `<Providers>`
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add src/components/providers.tsx src/app/layout.tsx && git commit -m "feat: add TanStack Query provider with 30s polling defaults"
 ```
@@ -1639,25 +1854,31 @@ git add src/components/providers.tsx src/app/layout.tsx && git commit -m "feat: 
 ### Task 4.2: Vessels API route
 
 **Files:**
+
 - Create: `src/app/api/vessels/route.ts`
 
 - [ ] **Step 1:** Create `src/app/api/vessels/route.ts`
+
 ```typescript
-import { NextResponse } from 'next/server';
-import { getVesselsInZone } from '@/lib/queries';
+import { NextResponse } from "next/server";
+import { getVesselsInZone } from "@/lib/queries";
 
 export async function GET() {
   try {
     const vessels = await getVesselsInZone();
     return NextResponse.json(vessels);
   } catch (error) {
-    console.error('Failed to fetch vessels:', error);
-    return NextResponse.json({ error: 'Failed to fetch vessels' }, { status: 500 });
+    console.error("Failed to fetch vessels:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch vessels" },
+      { status: 500 },
+    );
   }
 }
 ```
 
 - [ ] **Step 2:** Commit
+
 ```bash
 git add src/app/api/vessels/route.ts && git commit -m "feat: add vessels API route with geospatial filtering"
 ```
@@ -1667,17 +1888,19 @@ git add src/app/api/vessels/route.ts && git commit -m "feat: add vessels API rou
 ### Task 4.3: Positions SSE endpoint
 
 **Files:**
+
 - Create: `src/app/api/positions/route.ts`
 
 - [ ] **Step 1:** Create `src/app/api/positions/route.ts`
+
 ```typescript
-import { NextResponse } from 'next/server';
-import { getVesselsInZone, getPositionsSince } from '@/lib/queries';
+import { NextResponse } from "next/server";
+import { getVesselsInZone, getPositionsSince } from "@/lib/queries";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
-  if (searchParams.get('stream') === 'true') {
+  if (searchParams.get("stream") === "true") {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
@@ -1689,7 +1912,7 @@ export async function GET(request: Request) {
             if (newPositions.length > 0) {
               lastTimestamp = new Date().toISOString();
               controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify(newPositions)}\n\n`)
+                encoder.encode(`data: ${JSON.stringify(newPositions)}\n\n`),
               );
             }
           } catch {
@@ -1697,7 +1920,7 @@ export async function GET(request: Request) {
           }
         }, 5000);
 
-        request.signal.addEventListener('abort', () => {
+        request.signal.addEventListener("abort", () => {
           clearInterval(interval);
           controller.close();
         });
@@ -1706,9 +1929,9 @@ export async function GET(request: Request) {
 
     return new Response(stream, {
       headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
       },
     });
   }
@@ -1717,13 +1940,17 @@ export async function GET(request: Request) {
     const positions = await getVesselsInZone();
     return NextResponse.json(positions);
   } catch (error) {
-    console.error('Failed to fetch positions:', error);
-    return NextResponse.json({ error: 'Failed to fetch positions' }, { status: 500 });
+    console.error("Failed to fetch positions:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch positions" },
+      { status: 500 },
+    );
   }
 }
 ```
 
 - [ ] **Step 2:** Commit
+
 ```bash
 git add src/app/api/positions/route.ts && git commit -m "feat: add positions API route with SSE streaming support"
 ```
@@ -1733,29 +1960,35 @@ git add src/app/api/positions/route.ts && git commit -m "feat: add positions API
 ### Task 4.4: Weather API route
 
 **Files:**
+
 - Create: `src/app/api/weather/route.ts`
 
 - [ ] **Step 1:** Create `src/app/api/weather/route.ts`
+
 ```typescript
-import { NextResponse } from 'next/server';
-import { getLatestWeather, getWeatherHistory } from '@/lib/queries';
+import { NextResponse } from "next/server";
+import { getLatestWeather, getWeatherHistory } from "@/lib/queries";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const hours = parseInt(searchParams.get('hours') ?? '24', 10);
+  const hours = parseInt(searchParams.get("hours") ?? "24", 10);
 
   try {
     const [latest] = await getLatestWeather();
     const history = await getWeatherHistory(hours);
     return NextResponse.json({ current: latest ?? null, history });
   } catch (error) {
-    console.error('Failed to fetch weather:', error);
-    return NextResponse.json({ error: 'Failed to fetch weather' }, { status: 500 });
+    console.error("Failed to fetch weather:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch weather" },
+      { status: 500 },
+    );
   }
 }
 ```
 
 - [ ] **Step 2:** Commit
+
 ```bash
 git add src/app/api/weather/route.ts && git commit -m "feat: add weather API route with history support"
 ```
@@ -1765,28 +1998,36 @@ git add src/app/api/weather/route.ts && git commit -m "feat: add weather API rou
 ### Task 4.5: Summary API route
 
 **Files:**
+
 - Create: `src/app/api/summary/route.ts`
 
 - [ ] **Step 1:** Create `src/app/api/summary/route.ts`
+
 ```typescript
-import { NextResponse } from 'next/server';
-import { getLatestSummary, getSummaryByDate } from '@/lib/queries';
+import { NextResponse } from "next/server";
+import { getLatestSummary, getSummaryByDate } from "@/lib/queries";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const date = searchParams.get('date');
+  const date = searchParams.get("date");
 
   try {
-    const summaries = date ? await getSummaryByDate(date) : await getLatestSummary();
+    const summaries = date
+      ? await getSummaryByDate(date)
+      : await getLatestSummary();
     return NextResponse.json(summaries[0] ?? null);
   } catch (error) {
-    console.error('Failed to fetch summary:', error);
-    return NextResponse.json({ error: 'Failed to fetch summary' }, { status: 500 });
+    console.error("Failed to fetch summary:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch summary" },
+      { status: 500 },
+    );
   }
 }
 ```
 
 - [ ] **Step 2:** Commit
+
 ```bash
 git add src/app/api/summary/route.ts && git commit -m "feat: add daily summary API route"
 ```
@@ -1796,22 +2037,27 @@ git add src/app/api/summary/route.ts && git commit -m "feat: add daily summary A
 ### Task 4.6: NLQ API route + Gemini client
 
 **Files:**
+
 - Create: `src/lib/gemini.ts`
 - Create: `src/lib/nlq-prompt.ts`
 - Create: `src/app/api/nlq/route.ts`
 
 - [ ] **Step 1:** Create `src/lib/gemini.ts`
-```typescript
-import { GoogleGenAI } from '@google/genai';
+
+````typescript
+import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-export async function generateSql(userQuery: string, systemPrompt: string): Promise<{
+export async function generateSql(
+  userQuery: string,
+  systemPrompt: string,
+): Promise<{
   sql: string;
   explanation: string;
 }> {
   const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash',
+    model: "gemini-2.0-flash",
     contents: userQuery,
     config: {
       systemInstruction: systemPrompt,
@@ -1819,16 +2065,17 @@ export async function generateSql(userQuery: string, systemPrompt: string): Prom
     },
   });
 
-  const text = response.text ?? '';
+  const text = response.text ?? "";
   const sqlMatch = text.match(/```sql\n([\s\S]*?)```/);
   const sql = sqlMatch ? sqlMatch[1].trim() : text.trim();
-  const explanation = text.replace(/```[\s\S]*?```/g, '').trim();
+  const explanation = text.replace(/```[\s\S]*?```/g, "").trim();
 
   return { sql, explanation };
 }
-```
+````
 
 - [ ] **Step 2:** Create `src/lib/nlq-prompt.ts`
+
 ```typescript
 export const NLQ_SYSTEM_PROMPT = `You are a SQL query generator for a maritime port database (PostgreSQL + PostGIS).
 
@@ -1903,13 +2150,14 @@ Shows the 10 largest vessels currently in the area, ordered by length.`;
 ```
 
 - [ ] **Step 3:** Create `src/app/api/nlq/route.ts`
+
 ```typescript
-import { NextResponse } from 'next/server';
-import { nlqRequestSchema, sqlSafetySchema } from '@/lib/schemas';
-import { generateSql } from '@/lib/gemini';
-import { executeNlqQuery } from '@/lib/queries';
-import { NLQ_SYSTEM_PROMPT } from '@/lib/nlq-prompt';
-import { NLQ_TIMEOUT_MS } from '@/lib/constants';
+import { NextResponse } from "next/server";
+import { nlqRequestSchema, sqlSafetySchema } from "@/lib/schemas";
+import { generateSql } from "@/lib/gemini";
+import { executeNlqQuery } from "@/lib/queries";
+import { NLQ_SYSTEM_PROMPT } from "@/lib/nlq-prompt";
+import { NLQ_TIMEOUT_MS } from "@/lib/constants";
 
 export async function POST(request: Request) {
   try {
@@ -1918,18 +2166,24 @@ export async function POST(request: Request) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid query. Must be 3-500 characters.' },
-        { status: 400 }
+        { error: "Invalid query. Must be 3-500 characters." },
+        { status: 400 },
       );
     }
 
-    const { sql, explanation } = await generateSql(parsed.data.query, NLQ_SYSTEM_PROMPT);
+    const { sql, explanation } = await generateSql(
+      parsed.data.query,
+      NLQ_SYSTEM_PROMPT,
+    );
 
     const safetyCheck = sqlSafetySchema.safeParse(sql);
     if (!safetyCheck.success) {
       return NextResponse.json(
-        { error: "I couldn't generate a safe query for that question. Try rephrasing." },
-        { status: 422 }
+        {
+          error:
+            "I couldn't generate a safe query for that question. Try rephrasing.",
+        },
+        { status: 422 },
       );
     }
 
@@ -1942,20 +2196,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ sql, results, explanation });
     } catch (dbError) {
       clearTimeout(timeout);
-      console.error('NLQ query execution failed:', dbError);
+      console.error("NLQ query execution failed:", dbError);
       return NextResponse.json(
         { error: "I didn't understand your question. Try rephrasing." },
-        { status: 422 }
+        { status: 422 },
       );
     }
   } catch (error) {
-    console.error('NLQ endpoint error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("NLQ endpoint error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 ```
 
 - [ ] **Step 4:** Commit
+
 ```bash
 git add src/lib/gemini.ts src/lib/nlq-prompt.ts src/app/api/nlq/route.ts && git commit -m "feat: add NLQ API route with Gemini Flash text-to-SQL and safety validation"
 ```
@@ -1965,6 +2223,7 @@ git add src/lib/gemini.ts src/lib/nlq-prompt.ts src/app/api/nlq/route.ts && git 
 ### Task 4.7: Create TanStack Query hooks
 
 **Files:**
+
 - Create: `src/hooks/use-vessels.ts`
 - Create: `src/hooks/use-positions.ts`
 - Create: `src/hooks/use-weather.ts`
@@ -1972,18 +2231,19 @@ git add src/lib/gemini.ts src/lib/nlq-prompt.ts src/app/api/nlq/route.ts && git 
 - Create: `src/hooks/use-summary.ts`
 
 - [ ] **Step 1:** Create `src/hooks/use-vessels.ts`
-```typescript
-'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import type { VesselWithPosition } from '@/types';
+```typescript
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import type { VesselWithPosition } from "@/types";
 
 export function useVessels() {
   return useQuery<VesselWithPosition[]>({
-    queryKey: ['vessels'],
+    queryKey: ["vessels"],
     queryFn: async () => {
-      const res = await fetch('/api/vessels');
-      if (!res.ok) throw new Error('Failed to fetch vessels');
+      const res = await fetch("/api/vessels");
+      if (!res.ok) throw new Error("Failed to fetch vessels");
       return res.json();
     },
   });
@@ -1991,22 +2251,23 @@ export function useVessels() {
 ```
 
 - [ ] **Step 2:** Create `src/hooks/use-positions.ts`
-```typescript
-'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { POLLING_FALLBACK_MS, SSE_RETRY_MS } from '@/lib/constants';
-import type { VesselWithPosition } from '@/types';
+```typescript
+"use client";
+
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { POLLING_FALLBACK_MS, SSE_RETRY_MS } from "@/lib/constants";
+import type { VesselWithPosition } from "@/types";
 
 export function usePositions() {
   const queryClient = useQueryClient();
 
   const query = useQuery<VesselWithPosition[]>({
-    queryKey: ['positions'],
+    queryKey: ["positions"],
     queryFn: async () => {
-      const res = await fetch('/api/positions');
-      if (!res.ok) throw new Error('Failed to fetch positions');
+      const res = await fetch("/api/positions");
+      if (!res.ok) throw new Error("Failed to fetch positions");
       return res.json();
     },
     refetchInterval: POLLING_FALLBACK_MS,
@@ -2017,11 +2278,11 @@ export function usePositions() {
     let reconnectTimeout: ReturnType<typeof setTimeout>;
 
     function connectSSE() {
-      eventSource = new EventSource('/api/positions?stream=true');
+      eventSource = new EventSource("/api/positions?stream=true");
 
       eventSource.onmessage = (event) => {
         const newPositions: VesselWithPosition[] = JSON.parse(event.data);
-        queryClient.setQueryData<VesselWithPosition[]>(['positions'], (old) => {
+        queryClient.setQueryData<VesselWithPosition[]>(["positions"], (old) => {
           if (!old) return newPositions;
           const map = new Map(old.map((v) => [v.mmsi, v]));
           for (const pos of newPositions) {
@@ -2050,11 +2311,12 @@ export function usePositions() {
 ```
 
 - [ ] **Step 3:** Create `src/hooks/use-weather.ts`
-```typescript
-'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import type { WeatherReading } from '@/types';
+```typescript
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import type { WeatherReading } from "@/types";
 
 interface WeatherResponse {
   current: WeatherReading | null;
@@ -2063,10 +2325,10 @@ interface WeatherResponse {
 
 export function useWeather(hours: number = 24) {
   return useQuery<WeatherResponse>({
-    queryKey: ['weather', hours],
+    queryKey: ["weather", hours],
     queryFn: async () => {
       const res = await fetch(`/api/weather?hours=${hours}`);
-      if (!res.ok) throw new Error('Failed to fetch weather');
+      if (!res.ok) throw new Error("Failed to fetch weather");
       return res.json();
     },
     refetchInterval: 60_000,
@@ -2075,23 +2337,24 @@ export function useWeather(hours: number = 24) {
 ```
 
 - [ ] **Step 4:** Create `src/hooks/use-nlq.ts`
-```typescript
-'use client';
 
-import { useMutation } from '@tanstack/react-query';
-import type { NlqResponse } from '@/types';
+```typescript
+"use client";
+
+import { useMutation } from "@tanstack/react-query";
+import type { NlqResponse } from "@/types";
 
 export function useNlq() {
   return useMutation<NlqResponse, Error, string>({
     mutationFn: async (query: string) => {
-      const res = await fetch('/api/nlq', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/nlq", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query }),
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error ?? 'NLQ request failed');
+        throw new Error(err.error ?? "NLQ request failed");
       }
       return res.json();
     },
@@ -2100,19 +2363,20 @@ export function useNlq() {
 ```
 
 - [ ] **Step 5:** Create `src/hooks/use-summary.ts`
-```typescript
-'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import type { DailySummary } from '@/types';
+```typescript
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import type { DailySummary } from "@/types";
 
 export function useSummary(date?: string) {
   return useQuery<DailySummary | null>({
-    queryKey: ['summary', date],
+    queryKey: ["summary", date],
     queryFn: async () => {
-      const url = date ? `/api/summary?date=${date}` : '/api/summary';
+      const url = date ? `/api/summary?date=${date}` : "/api/summary";
       const res = await fetch(url);
-      if (!res.ok) throw new Error('Failed to fetch summary');
+      if (!res.ok) throw new Error("Failed to fetch summary");
       return res.json();
     },
   });
@@ -2120,6 +2384,7 @@ export function useSummary(date?: string) {
 ```
 
 - [ ] **Step 6:** Commit
+
 ```bash
 git add src/hooks/ && git commit -m "feat: add TanStack Query hooks with SSE integration for real-time positions"
 ```
@@ -2131,13 +2396,15 @@ git add src/hooks/ && git commit -m "feat: add TanStack Query hooks with SSE int
 ### Task 5.1: Create Zustand stores
 
 **Files:**
+
 - Create: `src/stores/use-map-store.ts`
 - Create: `src/stores/use-filter-store.ts`
 
 - [ ] **Step 1:** Create `src/stores/use-map-store.ts`
+
 ```typescript
-import { create } from 'zustand';
-import { PORT_CONFIG } from '@/lib/constants';
+import { create } from "zustand";
+import { PORT_CONFIG } from "@/lib/constants";
 
 interface MapState {
   center: [number, number];
@@ -2163,20 +2430,21 @@ export const useMapStore = create<MapState>((set) => ({
 ```
 
 - [ ] **Step 2:** Create `src/stores/use-filter-store.ts`
+
 ```typescript
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface FilterState {
   vesselTypes: string[];
-  timeRange: '24h' | '7d';
+  timeRange: "24h" | "7d";
   toggleVesselType: (type: string) => void;
-  setTimeRange: (range: '24h' | '7d') => void;
+  setTimeRange: (range: "24h" | "7d") => void;
   resetFilters: () => void;
 }
 
 export const useFilterStore = create<FilterState>((set) => ({
   vesselTypes: [],
-  timeRange: '24h',
+  timeRange: "24h",
   toggleVesselType: (type) =>
     set((state) => ({
       vesselTypes: state.vesselTypes.includes(type)
@@ -2184,11 +2452,12 @@ export const useFilterStore = create<FilterState>((set) => ({
         : [...state.vesselTypes, type],
     })),
   setTimeRange: (timeRange) => set({ timeRange }),
-  resetFilters: () => set({ vesselTypes: [], timeRange: '24h' }),
+  resetFilters: () => set({ vesselTypes: [], timeRange: "24h" }),
 }));
 ```
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add src/stores/ && git commit -m "feat: add Zustand stores for map viewport and dashboard filters"
 ```
@@ -2198,10 +2467,12 @@ git add src/stores/ && git commit -m "feat: add Zustand stores for map viewport 
 ### Task 5.2: Create MapView organism
 
 **Files:**
+
 - Create: `src/components/organisms/map-view.tsx`
 - Create: `src/hooks/use-map.ts`
 
 This is the core map component. Implementation details:
+
 - Initialize MapLibre GL JS on mount with CartoDB Positron basemap (`https://basemaps.cartocdn.com/gl/positron-gl-style/style.json`)
 - Center on `PORT_CONFIG.center`, zoom from `PORT_CONFIG.mapDefaults`
 - Add GeoJSON source `vessels` with circle + symbol layers, colored by `VESSEL_TYPE_COLORS`
@@ -2219,6 +2490,7 @@ This is the core map component. Implementation details:
 - [ ] **Step 3:** Verify map renders at `http://localhost:3000` (needs dev server running)
 
 - [ ] **Step 4:** Commit
+
 ```bash
 git add src/components/organisms/map-view.tsx src/hooks/use-map.ts && git commit -m "feat: implement MapView with vessel markers, geofence overlay, and click-to-select"
 ```
@@ -2228,9 +2500,11 @@ git add src/components/organisms/map-view.tsx src/hooks/use-map.ts && git commit
 ### Task 5.3: Create VesselDetail panel
 
 **Files:**
+
 - Create: `src/components/molecules/vessel-detail.tsx`
 
 Slide-over panel (shadcn Sheet) showing selected vessel info:
+
 - Name, MMSI, type badge (colored), flag
 - Dimensions (length x width), speed, heading, course
 - Destination, first/last seen timestamps
@@ -2239,6 +2513,7 @@ Slide-over panel (shadcn Sheet) showing selected vessel info:
 - [ ] **Step 1:** Create `src/components/molecules/vessel-detail.tsx`
 
 - [ ] **Step 2:** Commit
+
 ```bash
 git add src/components/molecules/vessel-detail.tsx && git commit -m "feat: add VesselDetail panel with vessel info display"
 ```
@@ -2250,6 +2525,7 @@ git add src/components/molecules/vessel-detail.tsx && git commit -m "feat: add V
 ### Task 6.1: Create KPI cards
 
 **Files:**
+
 - Create: `src/components/molecules/kpi-card.tsx`
 - Create: `src/components/organisms/kpi-row.tsx`
 
@@ -2258,6 +2534,7 @@ git add src/components/molecules/vessel-detail.tsx && git commit -m "feat: add V
 - [ ] **Step 2:** Create `src/components/organisms/kpi-row.tsx` — renders 3 KPI cards (Vessels in Zone, Arrivals Today, Departures Today) using data from `useVessels()`
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add src/components/molecules/kpi-card.tsx src/components/organisms/kpi-row.tsx && git commit -m "feat: add KPI cards for vessel counts"
 ```
@@ -2267,6 +2544,7 @@ git add src/components/molecules/kpi-card.tsx src/components/organisms/kpi-row.t
 ### Task 6.2: Create vessel type distribution chart
 
 **Files:**
+
 - Create: `src/components/organisms/vessel-type-chart.tsx`
 
 Recharts PieChart showing breakdown by vessel type. Colors from `VESSEL_TYPE_COLORS`. Data from `usePositions()`.
@@ -2274,6 +2552,7 @@ Recharts PieChart showing breakdown by vessel type. Colors from `VESSEL_TYPE_COL
 - [ ] **Step 1:** Create `src/components/organisms/vessel-type-chart.tsx`
 
 - [ ] **Step 2:** Commit
+
 ```bash
 git add src/components/organisms/vessel-type-chart.tsx && git commit -m "feat: add vessel type distribution chart with Recharts"
 ```
@@ -2283,26 +2562,31 @@ git add src/components/organisms/vessel-type-chart.tsx && git commit -m "feat: a
 ### Task 6.3: Create traffic timeline chart
 
 **Files:**
+
 - Create: `src/components/organisms/traffic-timeline.tsx`
 - Create: `src/app/api/vessels/timeline/route.ts`
 
 Recharts LineChart showing vessel count over time. Toggle 24h/7d via `useFilterStore().timeRange`.
 
 - [ ] **Step 1:** Create `src/app/api/vessels/timeline/route.ts`
+
 ```typescript
-import { NextResponse } from 'next/server';
-import { getTrafficTimeline } from '@/lib/queries';
+import { NextResponse } from "next/server";
+import { getTrafficTimeline } from "@/lib/queries";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const hours = parseInt(searchParams.get('hours') ?? '24', 10);
+  const hours = parseInt(searchParams.get("hours") ?? "24", 10);
 
   try {
     const data = await getTrafficTimeline(hours);
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Failed to fetch timeline:', error);
-    return NextResponse.json({ error: 'Failed to fetch timeline' }, { status: 500 });
+    console.error("Failed to fetch timeline:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch timeline" },
+      { status: 500 },
+    );
   }
 }
 ```
@@ -2310,6 +2594,7 @@ export async function GET(request: Request) {
 - [ ] **Step 2:** Create `src/components/organisms/traffic-timeline.tsx`
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add src/app/api/vessels/timeline/route.ts src/components/organisms/traffic-timeline.tsx && git commit -m "feat: add traffic timeline chart with 24h/7d toggle"
 ```
@@ -2319,6 +2604,7 @@ git add src/app/api/vessels/timeline/route.ts src/components/organisms/traffic-t
 ### Task 6.4: Create weather panel
 
 **Files:**
+
 - Create: `src/components/molecules/weather-card.tsx`
 - Create: `src/components/organisms/weather-panel.tsx`
 
@@ -2329,6 +2615,7 @@ Current conditions (wind, waves, visibility, temperature) + 24h trend mini-chart
 - [ ] **Step 2:** Create `src/components/organisms/weather-panel.tsx`
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add src/components/molecules/weather-card.tsx src/components/organisms/weather-panel.tsx && git commit -m "feat: add weather panel with current conditions and 24h trend chart"
 ```
@@ -2338,10 +2625,12 @@ git add src/components/molecules/weather-card.tsx src/components/organisms/weath
 ### Task 6.5: Create dashboard layout template
 
 **Files:**
+
 - Create: `src/components/templates/dashboard-layout.tsx`
 - Modify: `src/app/page.tsx`
 
 Grid layout:
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Header: Port name, NLQ search bar, time            │
@@ -2366,6 +2655,7 @@ Responsive: `lg` 3-col, `md` 2-col, `sm` single stack.
 - [ ] **Step 2:** Update `src/app/page.tsx` to render `<DashboardLayout />`
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add src/components/templates/dashboard-layout.tsx src/app/page.tsx && git commit -m "feat: implement dashboard template layout with responsive grid"
 ```
@@ -2377,9 +2667,11 @@ git add src/components/templates/dashboard-layout.tsx src/app/page.tsx && git co
 ### Task 7.1: Create NLQ search bar
 
 **Files:**
+
 - Create: `src/components/molecules/nlq-search-bar.tsx`
 
 Input + submit button. Suggested query chips below:
+
 - "Tankers this week"
 - "Vessels faster than 15 knots"
 - "Largest ships in port"
@@ -2390,6 +2682,7 @@ Clicking a chip populates input. Submit triggers `useNlq()` mutation.
 - [ ] **Step 1:** Create `src/components/molecules/nlq-search-bar.tsx`
 
 - [ ] **Step 2:** Commit
+
 ```bash
 git add src/components/molecules/nlq-search-bar.tsx && git commit -m "feat: add NLQ search bar with suggested query chips"
 ```
@@ -2399,9 +2692,11 @@ git add src/components/molecules/nlq-search-bar.tsx && git commit -m "feat: add 
 ### Task 7.2: Create NLQ results panel
 
 **Files:**
+
 - Create: `src/components/organisms/nlq-panel.tsx`
 
 Shows:
+
 - Map highlighting of matching vessels
 - Results table with column headers
 - Generated SQL in collapsible code block
@@ -2413,6 +2708,7 @@ Shows:
 - [ ] **Step 2:** Wire NLQ results to map: extract MMSI values from results → `useMapStore().setHighlightedMmsis()`
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add src/components/organisms/nlq-panel.tsx && git commit -m "feat: add NLQ results panel with map highlighting and results table"
 ```
@@ -2424,9 +2720,11 @@ git add src/components/organisms/nlq-panel.tsx && git commit -m "feat: add NLQ r
 ### Task 8.1: Create summary panel
 
 **Files:**
+
 - Create: `src/components/organisms/summary-panel.tsx`
 
 Displays latest daily summary:
+
 - Date header, summary text
 - Notable events as cards with type badges
 - Previous/next day navigation
@@ -2437,6 +2735,7 @@ Uses `useSummary()` hook.
 - [ ] **Step 1:** Create `src/components/organisms/summary-panel.tsx`
 
 - [ ] **Step 2:** Commit
+
 ```bash
 git add src/components/organisms/summary-panel.tsx && git commit -m "feat: add daily AI summary panel with event cards and date navigation"
 ```
@@ -2459,6 +2758,7 @@ Configure in n8n UI, export as JSON.
 - [ ] **Step 3:** Activate schedule
 - [ ] **Step 4:** Export to `n8n/weather-polling.json`
 - [ ] **Step 5:** Commit
+
 ```bash
 git add n8n/weather-polling.json && git commit -m "feat: add n8n weather polling workflow (hourly)"
 ```
@@ -2477,6 +2777,7 @@ git add n8n/weather-polling.json && git commit -m "feat: add n8n weather polling
 - [ ] **Step 2:** Test manually
 - [ ] **Step 3:** Export to `n8n/daily-summary.json`
 - [ ] **Step 4:** Commit
+
 ```bash
 git add n8n/daily-summary.json && git commit -m "feat: add n8n daily summary generation workflow"
 ```
@@ -2492,6 +2793,7 @@ git add n8n/daily-summary.json && git commit -m "feat: add n8n daily summary gen
 - [ ] **Step 1:** Create workflow in n8n UI
 - [ ] **Step 2:** Export to `n8n/data-retention.json`
 - [ ] **Step 3:** Commit
+
 ```bash
 git add n8n/data-retention.json && git commit -m "feat: add n8n data retention cleanup workflow (weekly, 90 days)"
 ```
@@ -2507,6 +2809,7 @@ git add n8n/data-retention.json && git commit -m "feat: add n8n data retention c
 - [ ] **Step 1:** Create workflow in n8n UI
 - [ ] **Step 2:** Export to `n8n/ais-health-check.json`
 - [ ] **Step 3:** Commit
+
 ```bash
 git add n8n/ais-health-check.json && git commit -m "feat: add n8n AIS worker health monitoring workflow"
 ```
@@ -2518,6 +2821,7 @@ git add n8n/ais-health-check.json && git commit -m "feat: add n8n AIS worker hea
 ### Task 10.1: Add loading and error states
 
 **Files:**
+
 - Create: `src/components/atoms/error-boundary.tsx`
 - Create: `src/components/atoms/loading-skeleton.tsx`
 - Modify: all organism components — add `isLoading`/`isError` handling
@@ -2525,6 +2829,7 @@ git add n8n/ais-health-check.json && git commit -m "feat: add n8n AIS worker hea
 - [ ] **Step 1:** Create error boundary and skeleton components
 - [ ] **Step 2:** Update all organisms to handle loading/error states from TanStack Query hooks
 - [ ] **Step 3:** Commit
+
 ```bash
 git add src/components/atoms/ src/components/organisms/ && git commit -m "feat: add loading skeletons and error boundaries across all components"
 ```
@@ -2534,53 +2839,67 @@ git add src/components/atoms/ src/components/organisms/ && git commit -m "feat: 
 ### Task 10.2: Write integration tests
 
 **Files:**
+
 - Create: `src/test/nlq-pipeline.test.ts`
 
 Tests the NLQ pipeline with mocked Gemini response:
+
 1. Input validation via Zod
 2. SQL safety validation
 3. Result formatting
 
 - [ ] **Step 1:** Create `src/test/nlq-pipeline.test.ts`
+
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { nlqRequestSchema, sqlSafetySchema } from '@/lib/schemas';
+import { describe, it, expect } from "vitest";
+import { nlqRequestSchema, sqlSafetySchema } from "@/lib/schemas";
 
-describe('NLQ Pipeline', () => {
-  describe('input validation', () => {
-    it('accepts valid queries', () => {
-      expect(nlqRequestSchema.safeParse({ query: 'Show me all tankers' }).success).toBe(true);
+describe("NLQ Pipeline", () => {
+  describe("input validation", () => {
+    it("accepts valid queries", () => {
+      expect(
+        nlqRequestSchema.safeParse({ query: "Show me all tankers" }).success,
+      ).toBe(true);
     });
 
-    it('rejects empty queries', () => {
-      expect(nlqRequestSchema.safeParse({ query: '' }).success).toBe(false);
+    it("rejects empty queries", () => {
+      expect(nlqRequestSchema.safeParse({ query: "" }).success).toBe(false);
     });
 
-    it('rejects queries over 500 chars', () => {
-      expect(nlqRequestSchema.safeParse({ query: 'a'.repeat(501) }).success).toBe(false);
+    it("rejects queries over 500 chars", () => {
+      expect(
+        nlqRequestSchema.safeParse({ query: "a".repeat(501) }).success,
+      ).toBe(false);
     });
   });
 
-  describe('SQL safety', () => {
-    it('allows SELECT with PostGIS', () => {
-      const sql = "SELECT v.name, ST_X(p.position) FROM vessels v JOIN positions p ON v.mmsi = p.mmsi WHERE v.vessel_type = 'Tanker'";
+  describe("SQL safety", () => {
+    it("allows SELECT with PostGIS", () => {
+      const sql =
+        "SELECT v.name, ST_X(p.position) FROM vessels v JOIN positions p ON v.mmsi = p.mmsi WHERE v.vessel_type = 'Tanker'";
       expect(sqlSafetySchema.safeParse(sql).success).toBe(true);
     });
 
-    it('blocks SQL injection attempts', () => {
-      expect(sqlSafetySchema.safeParse("SELECT 1; DROP TABLE vessels;--").success).toBe(false);
-      expect(sqlSafetySchema.safeParse("DELETE FROM vessels WHERE 1=1").success).toBe(false);
+    it("blocks SQL injection attempts", () => {
+      expect(
+        sqlSafetySchema.safeParse("SELECT 1; DROP TABLE vessels;--").success,
+      ).toBe(false);
+      expect(
+        sqlSafetySchema.safeParse("DELETE FROM vessels WHERE 1=1").success,
+      ).toBe(false);
     });
   });
 });
 ```
 
 - [ ] **Step 2:** Run tests
+
 ```bash
 npm test -- --run src/test/nlq-pipeline.test.ts
 ```
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add src/test/nlq-pipeline.test.ts && git commit -m "test: add integration tests for NLQ pipeline"
 ```
@@ -2590,9 +2909,11 @@ git add src/test/nlq-pipeline.test.ts && git commit -m "test: add integration te
 ### Task 10.3: Production environment + deployment
 
 **Files:**
+
 - Create: `.env.production.example`
 
 - [ ] **Step 1:** Create `.env.production.example`
+
 ```
 DATABASE_URL=postgresql://lehavre:CHANGE_ME@db:5432/lehavre_port
 DATABASE_URL_READONLY=postgresql://lehavre_readonly:CHANGE_ME@db:5432/lehavre_port
@@ -2606,6 +2927,7 @@ NODE_ENV=production
 ```
 
 - [ ] **Step 2:** Deploy to VPS
+
 1. Provision VPS (OVH/Hostinger, Ubuntu 22.04+, 2GB RAM min)
 2. Install Docker + Docker Compose
 3. Clone repo, copy `.env` with production values
@@ -2617,6 +2939,7 @@ NODE_ENV=production
 9. Verify dashboard loads at `https://your-domain.dev`
 
 - [ ] **Step 3:** Commit
+
 ```bash
 git add .env.production.example && git commit -m "chore: add production environment template"
 ```
@@ -2631,14 +2954,14 @@ Run after each phase that adds testable code. Fail = fix before moving to next p
 npm test -- --run --coverage
 ```
 
-| After Phase | Expected coverage | Action if below 80% |
-|---|---|---|
-| Phase 1 (scaffolding) | 90%+ (constants, schemas) | Add missing schema edge case tests |
-| Phase 2 (database) | N/A (DB queries, tested via integration) | — |
-| Phase 3 (AIS worker) | 85%+ (parser, db-operations) | Add parser edge cases |
-| Phase 4 (API routes) | 80%+ | Add route handler tests with mocked queries |
-| Phase 5-8 (frontend) | 80%+ | Add component render tests |
-| Phase 10 (integration) | 80%+ overall | Fill gaps identified by coverage report |
+| After Phase            | Expected coverage                        | Action if below 80%                         |
+| ---------------------- | ---------------------------------------- | ------------------------------------------- |
+| Phase 1 (scaffolding)  | 90%+ (constants, schemas)                | Add missing schema edge case tests          |
+| Phase 2 (database)     | N/A (DB queries, tested via integration) | —                                           |
+| Phase 3 (AIS worker)   | 85%+ (parser, db-operations)             | Add parser edge cases                       |
+| Phase 4 (API routes)   | 80%+                                     | Add route handler tests with mocked queries |
+| Phase 5-8 (frontend)   | 80%+                                     | Add component render tests                  |
+| Phase 10 (integration) | 80%+ overall                             | Fill gaps identified by coverage report     |
 
 ---
 

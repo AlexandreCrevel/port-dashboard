@@ -596,7 +596,7 @@ git add src/lib/schemas.ts src/lib/__tests__/schemas.test.ts && git commit -m "f
 - [ ] **Step 1:** Create `.env.example`
 ```
 # Database
-DATABASE_URL=postgresql://lehavre:${POSTGRES_PASSWORD}@localhost:5432/lehavre_port
+DATABASE_URL=postgresql://lehavre:lehavre_dev@localhost:5432/lehavre_port
 DATABASE_URL_READONLY=postgresql://lehavre_readonly:readonly_dev@localhost:5432/lehavre_port
 
 # AISstream
@@ -668,7 +668,7 @@ services:
     environment:
       POSTGRES_DB: lehavre_port
       POSTGRES_USER: lehavre
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: lehavre_dev
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
@@ -692,7 +692,7 @@ services:
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=n8n
       - DB_POSTGRESDB_USER=lehavre
-      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRESDB_PASSWORD=lehavre_dev
     volumes:
       - n8n_data:/home/node/.n8n
     depends_on:
@@ -706,7 +706,7 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      - DATABASE_URL=postgresql://lehavre:${POSTGRES_PASSWORD}@db:5432/lehavre_port
+      - DATABASE_URL=postgresql://lehavre:lehavre_dev@db:5432/lehavre_port
     depends_on:
       db:
         condition: service_healthy
@@ -729,7 +729,7 @@ services:
     environment:
       POSTGRES_DB: lehavre_port
       POSTGRES_USER: lehavre
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: lehavre_dev
     volumes:
       - pgdata_dev:/var/lib/postgresql/data
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql

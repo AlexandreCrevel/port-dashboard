@@ -12,6 +12,52 @@
 
 ---
 
+## Code Quality Rules (MANDATORY)
+
+Every subagent MUST follow these rules. Non-negotiable.
+
+| Rule | Threshold |
+|------|-----------|
+| **Max lines per file** | 150 (200 hard limit). Split proactively. |
+| **TDD** | Mandatory. Failing test FIRST, always. No exception. |
+| **Test coverage** | 80% minimum. Run `npm test -- --run --coverage` at each phase end. |
+| **DRY** | Zero duplication. Extract to utils/hooks on second occurrence. |
+| **Separation of Concerns** | One responsibility per file. No god files. |
+| **Single Responsibility** | Each function does one thing. One level of abstraction. |
+| **Naming** | Descriptive, intentional names. No abbreviations (except well-known: `db`, `api`, `url`). |
+| **No magic values** | All literals extracted to constants. |
+| **No hidden side effects** | Pure functions wherever possible. Side effects explicit and isolated. |
+| **Clean Code** | Follow all Clean Code principles (Robert C. Martin). |
+
+### File Split Strategy
+
+To respect the 150-line limit, the following files from the original plan MUST be split:
+
+| Original file | Split into | Responsibility |
+|---|---|---|
+| `src/lib/constants.ts` | `src/lib/constants/port-config.ts` | Port configuration (coords, bbox, geofence) |
+| | `src/lib/constants/vessel-types.ts` | Vessel type codes, categories, colors |
+| | `src/lib/constants/app-config.ts` | SSE, polling, timeout, retention, API URLs |
+| | `src/lib/constants/index.ts` | Re-export barrel |
+| `src/lib/db-utils.ts` | `src/lib/queries/vessels.ts` | Vessel + position queries |
+| | `src/lib/queries/weather.ts` | Weather queries |
+| | `src/lib/queries/summaries.ts` | Summary queries |
+| | `src/lib/queries/nlq.ts` | NLQ execution (read-only) |
+| | `src/lib/queries/kpi.ts` | KPI aggregate queries |
+| | `src/lib/queries/index.ts` | Re-export barrel |
+| `src/workers/ais-collector/index.ts` | `src/workers/ais-collector/db-operations.ts` | Upsert vessel, insert position |
+| | `src/workers/ais-collector/connection.ts` | WebSocket connect/reconnect logic |
+| | `src/workers/ais-collector/index.ts` | Entry point (wires connection + db ops) |
+
+### Coverage Checkpoints
+
+Run coverage at the end of each phase and verify 80%+ on all new code:
+```bash
+npm test -- --run --coverage
+```
+
+---
+
 ## Phase 1: Project Scaffolding + Docker Compose
 
 ### Task 1.1: Create Next.js project
@@ -144,16 +190,20 @@ git add vitest.config.ts src/test/ package.json && git commit -m "chore: configu
 
 ---
 
-### Task 1.5: Create centralized port configuration
+### Task 1.5: Create centralized port configuration (split into 3 files + barrel)
 
 **Files:**
-- Create: `src/lib/constants.ts`
-- Create: `src/lib/__tests__/constants.test.ts`
+- Create: `src/lib/constants/port-config.ts` (~30 lines)
+- Create: `src/lib/constants/vessel-types.ts` (~45 lines)
+- Create: `src/lib/constants/app-config.ts` (~15 lines)
+- Create: `src/lib/constants/index.ts` (barrel re-export)
+- Create: `src/lib/__tests__/port-config.test.ts`
+- Create: `src/lib/__tests__/vessel-types.test.ts`
 
-- [ ] **Step 1:** Write test `src/lib/__tests__/constants.test.ts`
+- [ ] **Step 1:** Write test `src/lib/__tests__/port-config.test.ts`
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { PORT_CONFIG, VESSEL_TYPE_COLORS, VESSEL_TYPE_CATEGORIES } from '../constants';
+import { PORT_CONFIG } from '../constants';
 
 describe('PORT_CONFIG', () => {
   it('has valid center coordinates for Le Havre', () => {
@@ -168,7 +218,18 @@ describe('PORT_CONFIG', () => {
     expect(center.longitude).toBeGreaterThan(boundingBox.min.longitude);
     expect(center.longitude).toBeLessThan(boundingBox.max.longitude);
   });
+
+  it('has closed geofence polygon', () => {
+    const geo = PORT_CONFIG.geofence;
+    expect(geo[0]).toEqual(geo[geo.length - 1]);
+  });
 });
+```
+
+- [ ] **Step 2:** Write test `src/lib/__tests__/vessel-types.test.ts`
+```typescript
+import { describe, it, expect } from 'vitest';
+import { VESSEL_TYPE_COLORS, VESSEL_TYPE_CATEGORIES } from '../constants';
 
 describe('VESSEL_TYPE_CATEGORIES', () => {
   it('has a color for every category', () => {
@@ -179,12 +240,12 @@ describe('VESSEL_TYPE_CATEGORIES', () => {
 });
 ```
 
-- [ ] **Step 2:** Run test — expect FAIL (module not found)
+- [ ] **Step 3:** Run tests — expect FAIL
 ```bash
-npm test -- --run src/lib/__tests__/constants.test.ts
+npm test -- --run src/lib/__tests__/port-config.test.ts src/lib/__tests__/vessel-types.test.ts
 ```
 
-- [ ] **Step 3:** Create `src/lib/constants.ts`
+- [ ] **Step 4:** Create `src/lib/constants/port-config.ts`
 ```typescript
 export const PORT_CONFIG = {
   name: 'Le Havre',
@@ -217,7 +278,10 @@ export const PORT_CONFIG = {
 } as const;
 
 export type PortConfig = typeof PORT_CONFIG;
+```
 
+- [ ] **Step 5:** Create `src/lib/constants/vessel-types.ts`
+```typescript
 export const VESSEL_TYPES: Record<number, string> = {
   20: 'Wing in Ground',
   30: 'Fishing',
@@ -259,7 +323,10 @@ export const VESSEL_TYPE_COLORS: Record<string, string> = {
   'High Speed Craft': '#06b6d4',
   Other: '#6b7280',
 };
+```
 
+- [ ] **Step 6:** Create `src/lib/constants/app-config.ts`
+```typescript
 export const SSE_RETRY_MS = 3000;
 export const POLLING_FALLBACK_MS = 30_000;
 export const NLQ_TIMEOUT_MS = 5000;
@@ -273,14 +340,21 @@ export const WEATHER_API = {
 export const AIS_WEBSOCKET_URL = 'wss://stream.aisstream.io/v0/stream';
 ```
 
-- [ ] **Step 4:** Run test — expect PASS
-```bash
-npm test -- --run src/lib/__tests__/constants.test.ts
+- [ ] **Step 7:** Create `src/lib/constants/index.ts`
+```typescript
+export { PORT_CONFIG, type PortConfig } from './port-config';
+export { VESSEL_TYPES, VESSEL_TYPE_CATEGORIES, VESSEL_TYPE_COLORS } from './vessel-types';
+export { SSE_RETRY_MS, POLLING_FALLBACK_MS, NLQ_TIMEOUT_MS, DATA_RETENTION_DAYS, WEATHER_API, AIS_WEBSOCKET_URL } from './app-config';
 ```
 
-- [ ] **Step 5:** Commit
+- [ ] **Step 8:** Run tests — expect PASS
 ```bash
-git add src/lib/constants.ts src/lib/__tests__/constants.test.ts && git commit -m "feat: add centralized port configuration and vessel type constants"
+npm test -- --run src/lib/__tests__/port-config.test.ts src/lib/__tests__/vessel-types.test.ts
+```
+
+- [ ] **Step 9:** Commit
+```bash
+git add src/lib/constants/ src/lib/__tests__/port-config.test.ts src/lib/__tests__/vessel-types.test.ts && git commit -m "feat: add centralized port configuration and vessel type constants (SoC split)"
 ```
 
 ---
@@ -930,143 +1004,134 @@ git add src/lib/schema.ts drizzle/ && git commit -m "feat: define Drizzle schema
 
 ---
 
-### Task 2.4: Create database utility functions
+### Task 2.4: Create query modules (SoC split, max 150 lines each)
+
+Instead of a single `db-utils.ts`, queries are split by domain into `src/lib/queries/`.
 
 **Files:**
-- Create: `src/lib/db-utils.ts`
+- Create: `src/lib/queries/vessels.ts` (~50 lines) — vessel + position spatial queries
+- Create: `src/lib/queries/weather.ts` (~25 lines) — weather queries
+- Create: `src/lib/queries/summaries.ts` (~25 lines) — daily summary queries
+- Create: `src/lib/queries/nlq.ts` (~10 lines) — NLQ read-only execution
+- Create: `src/lib/queries/kpi.ts` (~35 lines) — KPI aggregate queries
+- Create: `src/lib/queries/index.ts` — barrel re-export
 
-- [ ] **Step 1:** Create `src/lib/db-utils.ts`
+- [ ] **Step 1:** Create `src/lib/queries/vessels.ts`
 ```typescript
-import { db, dbReadonly } from './db';
-import { vessels, positions, weatherReadings, dailySummaries } from './schema';
-import { eq, desc, gte, sql } from 'drizzle-orm';
-import { PORT_CONFIG } from './constants';
+import { db } from '../db';
+import { sql } from 'drizzle-orm';
+import { PORT_CONFIG } from '../constants';
+
+const BBOX = PORT_CONFIG.boundingBox;
+
+const VESSELS_IN_ZONE_BASE = sql`
+  SELECT DISTINCT ON (v.mmsi)
+    v.mmsi, v.name, v.vessel_type, v.flag, v.length, v.width, v.destination,
+    v.first_seen, v.last_seen,
+    ST_X(p.position) as longitude, ST_Y(p.position) as latitude,
+    p.speed, p.heading, p.course, p.timestamp as position_timestamp
+  FROM vessels v
+  INNER JOIN positions p ON v.mmsi = p.mmsi
+  WHERE ST_Within(
+    p.position,
+    ST_MakeEnvelope(${BBOX.min.longitude}, ${BBOX.min.latitude}, ${BBOX.max.longitude}, ${BBOX.max.latitude}, 4326)
+  )
+`;
 
 export async function getVesselsInZone() {
-  return db.execute(sql`
-    SELECT DISTINCT ON (v.mmsi)
-      v.mmsi, v.name, v.vessel_type, v.flag, v.length, v.width, v.destination,
-      v.first_seen, v.last_seen,
-      ST_X(p.position) as longitude,
-      ST_Y(p.position) as latitude,
-      p.speed, p.heading, p.course,
-      p.timestamp as position_timestamp
-    FROM vessels v
-    INNER JOIN positions p ON v.mmsi = p.mmsi
-    WHERE p.timestamp > NOW() - INTERVAL '1 hour'
-    AND ST_Within(
-      p.position,
-      ST_MakeEnvelope(
-        ${PORT_CONFIG.boundingBox.min.longitude},
-        ${PORT_CONFIG.boundingBox.min.latitude},
-        ${PORT_CONFIG.boundingBox.max.longitude},
-        ${PORT_CONFIG.boundingBox.max.latitude},
-        4326
-      )
-    )
-    ORDER BY v.mmsi, p.timestamp DESC
-  `);
+  return db.execute(sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > NOW() - INTERVAL '1 hour' ORDER BY v.mmsi, p.timestamp DESC`);
 }
 
 export async function getPositionsSince(since: string) {
-  return db.execute(sql`
-    SELECT DISTINCT ON (v.mmsi)
-      v.mmsi, v.name, v.vessel_type, v.flag, v.length, v.width, v.destination,
-      v.first_seen, v.last_seen,
-      ST_X(p.position) as longitude,
-      ST_Y(p.position) as latitude,
-      p.speed, p.heading, p.course,
-      p.timestamp as position_timestamp
-    FROM vessels v
-    INNER JOIN positions p ON v.mmsi = p.mmsi
-    WHERE p.timestamp > ${since}::timestamptz
-    AND ST_Within(
-      p.position,
-      ST_MakeEnvelope(
-        ${PORT_CONFIG.boundingBox.min.longitude},
-        ${PORT_CONFIG.boundingBox.min.latitude},
-        ${PORT_CONFIG.boundingBox.max.longitude},
-        ${PORT_CONFIG.boundingBox.max.latitude},
-        4326
-      )
-    )
-    ORDER BY v.mmsi, p.timestamp DESC
-  `);
-}
-
-export async function getLatestWeather() {
-  return db
-    .select()
-    .from(weatherReadings)
-    .orderBy(desc(weatherReadings.timestamp))
-    .limit(1);
-}
-
-export async function getWeatherHistory(hours: number = 24) {
-  return db
-    .select()
-    .from(weatherReadings)
-    .where(gte(weatherReadings.timestamp, sql`NOW() - INTERVAL '${sql.raw(String(hours))} hours'`))
-    .orderBy(weatherReadings.timestamp);
+  return db.execute(sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > ${since}::timestamptz ORDER BY v.mmsi, p.timestamp DESC`);
 }
 
 export async function getTrafficTimeline(hours: number = 24) {
   return db.execute(sql`
-    SELECT
-      date_trunc('hour', p.timestamp) as hour,
-      COUNT(DISTINCT p.mmsi) as vessel_count
+    SELECT date_trunc('hour', p.timestamp) as hour, COUNT(DISTINCT p.mmsi) as vessel_count
     FROM positions p
     WHERE p.timestamp > NOW() - INTERVAL '${sql.raw(String(hours))} hours'
     GROUP BY date_trunc('hour', p.timestamp)
     ORDER BY hour
   `);
 }
+```
+
+- [ ] **Step 2:** Create `src/lib/queries/weather.ts`
+```typescript
+import { db } from '../db';
+import { weatherReadings } from '../schema';
+import { desc, gte, sql } from 'drizzle-orm';
+
+export async function getLatestWeather() {
+  return db.select().from(weatherReadings).orderBy(desc(weatherReadings.timestamp)).limit(1);
+}
+
+export async function getWeatherHistory(hours: number = 24) {
+  return db.select().from(weatherReadings)
+    .where(gte(weatherReadings.timestamp, sql`NOW() - INTERVAL '${sql.raw(String(hours))} hours'`))
+    .orderBy(weatherReadings.timestamp);
+}
+```
+
+- [ ] **Step 3:** Create `src/lib/queries/summaries.ts`
+```typescript
+import { db } from '../db';
+import { dailySummaries } from '../schema';
+import { eq, desc } from 'drizzle-orm';
+
+export async function getLatestSummary() {
+  return db.select().from(dailySummaries).orderBy(desc(dailySummaries.date)).limit(1);
+}
+
+export async function getSummaryByDate(dateStr: string) {
+  return db.select().from(dailySummaries).where(eq(dailySummaries.date, dateStr));
+}
+```
+
+- [ ] **Step 4:** Create `src/lib/queries/nlq.ts`
+```typescript
+import { dbReadonly } from '../db';
+import { sql } from 'drizzle-orm';
+
+export async function executeNlqQuery(sqlQuery: string) {
+  return dbReadonly.execute(sql.raw(sqlQuery));
+}
+```
+
+- [ ] **Step 5:** Create `src/lib/queries/kpi.ts`
+```typescript
+import { db } from '../db';
+import { sql } from 'drizzle-orm';
+import { PORT_CONFIG } from '../constants';
+
+const BBOX = PORT_CONFIG.boundingBox;
 
 export async function getKpiMetrics() {
   return db.execute(sql`
     SELECT
       (SELECT COUNT(DISTINCT mmsi) FROM positions
         WHERE timestamp > NOW() - INTERVAL '1 hour'
-        AND ST_Within(position, ST_MakeEnvelope(
-          ${PORT_CONFIG.boundingBox.min.longitude},
-          ${PORT_CONFIG.boundingBox.min.latitude},
-          ${PORT_CONFIG.boundingBox.max.longitude},
-          ${PORT_CONFIG.boundingBox.max.latitude}, 4326
-        ))
+        AND ST_Within(position, ST_MakeEnvelope(${BBOX.min.longitude}, ${BBOX.min.latitude}, ${BBOX.max.longitude}, ${BBOX.max.latitude}, 4326))
       ) as vessels_in_zone,
-      (SELECT COUNT(DISTINCT mmsi) FROM vessels
-        WHERE first_seen::date = CURRENT_DATE
-      ) as arrivals_today,
-      (SELECT COUNT(DISTINCT mmsi) FROM vessels
-        WHERE last_seen::date = CURRENT_DATE
-        AND last_seen < NOW() - INTERVAL '1 hour'
-      ) as departures_today
+      (SELECT COUNT(DISTINCT mmsi) FROM vessels WHERE first_seen::date = CURRENT_DATE) as arrivals_today,
+      (SELECT COUNT(DISTINCT mmsi) FROM vessels WHERE last_seen::date = CURRENT_DATE AND last_seen < NOW() - INTERVAL '1 hour') as departures_today
   `);
-}
-
-export async function executeNlqQuery(sqlQuery: string) {
-  return dbReadonly.execute(sql.raw(sqlQuery));
-}
-
-export async function getLatestSummary() {
-  return db
-    .select()
-    .from(dailySummaries)
-    .orderBy(desc(dailySummaries.date))
-    .limit(1);
-}
-
-export async function getSummaryByDate(dateStr: string) {
-  return db
-    .select()
-    .from(dailySummaries)
-    .where(eq(dailySummaries.date, dateStr));
 }
 ```
 
-- [ ] **Step 2:** Commit
+- [ ] **Step 6:** Create `src/lib/queries/index.ts`
+```typescript
+export { getVesselsInZone, getPositionsSince, getTrafficTimeline } from './vessels';
+export { getLatestWeather, getWeatherHistory } from './weather';
+export { getLatestSummary, getSummaryByDate } from './summaries';
+export { executeNlqQuery } from './nlq';
+export { getKpiMetrics } from './kpi';
+```
+
+- [ ] **Step 7:** Commit
 ```bash
-git add src/lib/db-utils.ts && git commit -m "feat: add database utility functions with PostGIS spatial queries"
+git add src/lib/queries/ && git commit -m "feat: add query modules split by domain (vessels, weather, summaries, nlq, kpi)"
 ```
 
 ---
@@ -1351,30 +1416,57 @@ git add src/workers/ais-collector/parser.ts src/workers/ais-collector/parser.tes
 
 ---
 
-### Task 3.3: Implement AIS worker main loop
+### Task 3.3: Implement AIS worker (split into 3 files)
 
 **Files:**
-- Create: `src/workers/ais-collector/index.ts`
+- Create: `src/workers/ais-collector/db-operations.ts` (~60 lines) — DB upsert/insert + vessel category mapping
+- Create: `src/workers/ais-collector/db-operations.test.ts` — unit test for getVesselCategory
+- Create: `src/workers/ais-collector/connection.ts` (~50 lines) — WebSocket connect/reconnect logic
+- Create: `src/workers/ais-collector/index.ts` (~15 lines) — entry point wiring
 
-- [ ] **Step 1:** Create `src/workers/ais-collector/index.ts`
+- [ ] **Step 1:** Write test `src/workers/ais-collector/db-operations.test.ts`
 ```typescript
-import WebSocket from 'ws';
+import { describe, it, expect } from 'vitest';
+import { getVesselCategory } from './db-operations';
+
+describe('getVesselCategory', () => {
+  it('maps cargo codes (70-79) to Cargo', () => {
+    expect(getVesselCategory(70)).toBe('Cargo');
+    expect(getVesselCategory(75)).toBe('Cargo');
+  });
+
+  it('maps tanker codes (80-89) to Tanker', () => {
+    expect(getVesselCategory(80)).toBe('Tanker');
+  });
+
+  it('maps passenger codes (60-69) to Passenger', () => {
+    expect(getVesselCategory(60)).toBe('Passenger');
+  });
+
+  it('maps fishing code 30 to Fishing', () => {
+    expect(getVesselCategory(30)).toBe('Fishing');
+  });
+
+  it('maps unknown codes to Other', () => {
+    expect(getVesselCategory(99)).toBe('Other');
+    expect(getVesselCategory(0)).toBe('Other');
+  });
+});
+```
+
+- [ ] **Step 2:** Run test — expect FAIL
+```bash
+npx vitest run src/workers/ais-collector/db-operations.test.ts
+```
+
+- [ ] **Step 3:** Create `src/workers/ais-collector/db-operations.ts`
+```typescript
 import { Pool } from 'pg';
-import { parseAisMessage, isPositionReport, isStaticData } from './parser.js';
-
-const PORT_CONFIG = {
-  boundingBox: {
-    min: { latitude: 49.40, longitude: -0.15 },
-    max: { latitude: 49.55, longitude: 0.40 },
-  },
-};
-
-const AIS_WS_URL = 'wss://stream.aisstream.io/v0/stream';
-const RECONNECT_DELAY_MS = 5000;
+import type { ParsedPosition, ParsedStaticData } from './parser.js';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-function getVesselCategory(typeCode: number): string {
+export function getVesselCategory(typeCode: number): string {
   if (typeCode >= 70 && typeCode <= 79) return 'Cargo';
   if (typeCode >= 80 && typeCode <= 89) return 'Tanker';
   if (typeCode >= 60 && typeCode <= 69) return 'Passenger';
@@ -1384,10 +1476,9 @@ function getVesselCategory(typeCode: number): string {
   return 'Other';
 }
 
-async function upsertVesselFromPosition(mmsi: string, shipName: string | null, timestamp: Date) {
+export async function upsertVesselFromPosition(mmsi: string, shipName: string | null, timestamp: Date) {
   await pool.query(
-    `INSERT INTO vessels (mmsi, name, first_seen, last_seen)
-     VALUES ($1, $2, $3, $3)
+    `INSERT INTO vessels (mmsi, name, first_seen, last_seen) VALUES ($1, $2, $3, $3)
      ON CONFLICT (mmsi) DO UPDATE SET
        name = COALESCE(EXCLUDED.name, vessels.name),
        last_seen = GREATEST(EXCLUDED.last_seen, vessels.last_seen)`,
@@ -1395,11 +1486,7 @@ async function upsertVesselFromPosition(mmsi: string, shipName: string | null, t
   );
 }
 
-async function upsertVesselFromStatic(data: {
-  mmsi: string; name: string; vesselType: number;
-  destination: string | null; length: number | null; width: number | null;
-  timestamp: Date;
-}) {
+export async function upsertVesselFromStatic(data: ParsedStaticData) {
   const typeCategory = getVesselCategory(data.vesselType);
   await pool.query(
     `INSERT INTO vessels (mmsi, name, vessel_type, destination, length, width, first_seen, last_seen)
@@ -1415,34 +1502,48 @@ async function upsertVesselFromStatic(data: {
   );
 }
 
-async function insertPosition(data: {
-  mmsi: string; longitude: number; latitude: number;
-  speed: number; heading: number | null; course: number;
-  timestamp: Date;
-}) {
+export async function insertPosition(data: ParsedPosition) {
   await pool.query(
     `INSERT INTO positions (mmsi, position, speed, heading, course, timestamp)
      VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), 4326), $4, $5, $6, $7)`,
     [data.mmsi, data.longitude, data.latitude, data.speed, data.heading, data.course, data.timestamp]
   );
 }
+```
 
-function connect() {
+- [ ] **Step 4:** Run test — expect PASS
+```bash
+npx vitest run src/workers/ais-collector/db-operations.test.ts
+```
+
+- [ ] **Step 5:** Create `src/workers/ais-collector/connection.ts`
+```typescript
+import WebSocket from 'ws';
+import { parseAisMessage, isPositionReport, isStaticData } from './parser.js';
+import { upsertVesselFromPosition, upsertVesselFromStatic, insertPosition } from './db-operations.js';
+
+const AIS_WS_URL = 'wss://stream.aisstream.io/v0/stream';
+const RECONNECT_DELAY_MS = 5000;
+
+const BOUNDING_BOX = {
+  min: { latitude: 49.40, longitude: -0.15 },
+  max: { latitude: 49.55, longitude: 0.40 },
+};
+
+export function connect() {
   console.log('[AIS] Connecting to AISstream...');
   const ws = new WebSocket(AIS_WS_URL);
 
   ws.on('open', () => {
     console.log('[AIS] Connected. Sending subscription...');
-    const subscription = {
+    ws.send(JSON.stringify({
       APIKey: process.env.AISSTREAM_API_KEY,
       BoundingBoxes: [[
-        [PORT_CONFIG.boundingBox.min.latitude, PORT_CONFIG.boundingBox.min.longitude],
-        [PORT_CONFIG.boundingBox.max.latitude, PORT_CONFIG.boundingBox.max.longitude],
+        [BOUNDING_BOX.min.latitude, BOUNDING_BOX.min.longitude],
+        [BOUNDING_BOX.max.latitude, BOUNDING_BOX.max.longitude],
       ]],
       FilterMessageTypes: ['PositionReport', 'ShipStaticData'],
-    };
-    ws.send(JSON.stringify(subscription));
-    console.log('[AIS] Subscription sent.');
+    }));
   });
 
   ws.on('message', async (data: Buffer) => {
@@ -1461,28 +1562,25 @@ function connect() {
     }
   });
 
-  ws.on('error', (err) => {
-    console.error('[AIS] WebSocket error:', err.message);
-  });
-
+  ws.on('error', (err) => console.error('[AIS] WebSocket error:', err.message));
   ws.on('close', (code) => {
-    console.log(`[AIS] Connection closed (${code}). Reconnecting in ${RECONNECT_DELAY_MS}ms...`);
+    console.log(`[AIS] Closed (${code}). Reconnecting in ${RECONNECT_DELAY_MS}ms...`);
     setTimeout(connect, RECONNECT_DELAY_MS);
   });
 }
+```
+
+- [ ] **Step 6:** Create `src/workers/ais-collector/index.ts`
+```typescript
+import { connect } from './connection.js';
 
 connect();
 console.log('[AIS] Worker started.');
 ```
 
-- [ ] **Step 2:** Test locally (requires DB running + AIS API key)
+- [ ] **Step 7:** Commit
 ```bash
-cd src/workers/ais-collector && AISSTREAM_API_KEY=xxx DATABASE_URL=postgresql://lehavre:${POSTGRES_PASSWORD}@localhost:5432/lehavre_port node --loader tsx index.ts
-```
-
-- [ ] **Step 3:** Commit
-```bash
-git add src/workers/ais-collector/index.ts && git commit -m "feat: implement AIS WebSocket collector worker with auto-reconnect"
+git add src/workers/ais-collector/ && git commit -m "feat: implement AIS WebSocket collector (SoC split: db-operations, connection, entry)"
 ```
 
 ---
@@ -1546,7 +1644,7 @@ git add src/components/providers.tsx src/app/layout.tsx && git commit -m "feat: 
 - [ ] **Step 1:** Create `src/app/api/vessels/route.ts`
 ```typescript
 import { NextResponse } from 'next/server';
-import { getVesselsInZone } from '@/lib/db-utils';
+import { getVesselsInZone } from '@/lib/queries';
 
 export async function GET() {
   try {
@@ -1574,7 +1672,7 @@ git add src/app/api/vessels/route.ts && git commit -m "feat: add vessels API rou
 - [ ] **Step 1:** Create `src/app/api/positions/route.ts`
 ```typescript
 import { NextResponse } from 'next/server';
-import { getVesselsInZone, getPositionsSince } from '@/lib/db-utils';
+import { getVesselsInZone, getPositionsSince } from '@/lib/queries';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -1640,7 +1738,7 @@ git add src/app/api/positions/route.ts && git commit -m "feat: add positions API
 - [ ] **Step 1:** Create `src/app/api/weather/route.ts`
 ```typescript
 import { NextResponse } from 'next/server';
-import { getLatestWeather, getWeatherHistory } from '@/lib/db-utils';
+import { getLatestWeather, getWeatherHistory } from '@/lib/queries';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -1672,7 +1770,7 @@ git add src/app/api/weather/route.ts && git commit -m "feat: add weather API rou
 - [ ] **Step 1:** Create `src/app/api/summary/route.ts`
 ```typescript
 import { NextResponse } from 'next/server';
-import { getLatestSummary, getSummaryByDate } from '@/lib/db-utils';
+import { getLatestSummary, getSummaryByDate } from '@/lib/queries';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -1809,7 +1907,7 @@ Shows the 10 largest vessels currently in the area, ordered by length.`;
 import { NextResponse } from 'next/server';
 import { nlqRequestSchema, sqlSafetySchema } from '@/lib/schemas';
 import { generateSql } from '@/lib/gemini';
-import { executeNlqQuery } from '@/lib/db-utils';
+import { executeNlqQuery } from '@/lib/queries';
 import { NLQ_SYSTEM_PROMPT } from '@/lib/nlq-prompt';
 import { NLQ_TIMEOUT_MS } from '@/lib/constants';
 
@@ -2193,7 +2291,7 @@ Recharts LineChart showing vessel count over time. Toggle 24h/7d via `useFilterS
 - [ ] **Step 1:** Create `src/app/api/vessels/timeline/route.ts`
 ```typescript
 import { NextResponse } from 'next/server';
-import { getTrafficTimeline } from '@/lib/db-utils';
+import { getTrafficTimeline } from '@/lib/queries';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -2525,19 +2623,40 @@ git add .env.production.example && git commit -m "chore: add production environm
 
 ---
 
+## Coverage Checkpoints
+
+Run after each phase that adds testable code. Fail = fix before moving to next phase.
+
+```bash
+npm test -- --run --coverage
+```
+
+| After Phase | Expected coverage | Action if below 80% |
+|---|---|---|
+| Phase 1 (scaffolding) | 90%+ (constants, schemas) | Add missing schema edge case tests |
+| Phase 2 (database) | N/A (DB queries, tested via integration) | — |
+| Phase 3 (AIS worker) | 85%+ (parser, db-operations) | Add parser edge cases |
+| Phase 4 (API routes) | 80%+ | Add route handler tests with mocked queries |
+| Phase 5-8 (frontend) | 80%+ | Add component render tests |
+| Phase 10 (integration) | 80%+ overall | Fill gaps identified by coverage report |
+
+---
+
 ## Verification
 
 After all phases are complete:
 
-1. **Data flowing:** AIS worker populates vessels/positions tables continuously
-2. **Map:** Vessels visible on MapLibre map, click shows details
-3. **Dashboard:** KPIs, charts, weather all rendering with real data
-4. **NLQ:** Type "tankers this week" → results on map and table
-5. **Summary:** Daily summary panel shows AI-generated content (after first 22:00 run)
-6. **n8n:** All 4 workflows active and green
-7. **Tests:** `npm test -- --run` all pass
-8. **Docker:** `docker compose ps` shows all services healthy
-9. **SSL:** Dashboard accessible via HTTPS
+1. **Coverage:** `npm test -- --run --coverage` shows 80%+ overall
+2. **File sizes:** No file exceeds 150 lines (200 hard max) — verify with `find src -name '*.ts' -o -name '*.tsx' | xargs wc -l | sort -rn | head -20`
+3. **Data flowing:** AIS worker populates vessels/positions tables continuously
+4. **Map:** Vessels visible on MapLibre map, click shows details
+5. **Dashboard:** KPIs, charts, weather all rendering with real data
+6. **NLQ:** Type "tankers this week" → results on map and table
+7. **Summary:** Daily summary panel shows AI-generated content (after first 22:00 run)
+8. **n8n:** All 4 workflows active and green
+9. **Tests:** `npm test -- --run` all pass
+10. **Docker:** `docker compose ps` shows all services healthy
+11. **SSL:** Dashboard accessible via HTTPS
 
 ---
 

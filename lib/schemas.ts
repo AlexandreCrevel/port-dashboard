@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const vesselSchema = z.object({
-  mmsi: z.string().regex(/^\d{9}$/, 'MMSI must be 9 digits'),
+  mmsi: z.string().regex(/^\d{9}$/, "MMSI must be 9 digits"),
   name: z.string().nullable(),
   vesselType: z.string().nullable(),
   flag: z.string().nullable(),
@@ -37,9 +37,12 @@ export const weatherReadingSchema = z.object({
 
 export const sqlSafetySchema = z
   .string()
-  .refine((sql) => /^SELECT\s/i.test(sql.trim()), 'Only SELECT queries allowed')
+  .refine((sql) => /^SELECT\s/i.test(sql.trim()), "Only SELECT queries allowed")
   .refine(
-    (sql) => !/\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|GRANT|REVOKE)\b/i.test(sql),
-    'DDL/DML statements not allowed',
+    (sql) =>
+      !/\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|GRANT|REVOKE)\b/i.test(
+        sql,
+      ),
+    "DDL/DML statements not allowed",
   )
-  .refine((sql) => !/;\s*\S/.test(sql), 'Multiple statements not allowed');
+  .refine((sql) => !/;/.test(sql), "Multiple statements not allowed");

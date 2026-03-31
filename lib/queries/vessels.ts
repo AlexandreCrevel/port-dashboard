@@ -1,6 +1,9 @@
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { z } from 'zod';
 import { PORT_CONFIG } from '../constants';
+
+const TimestampSchema = z.string().datetime({ offset: true });
 
 const BBOX = PORT_CONFIG.boundingBox;
 
@@ -23,7 +26,8 @@ export async function getVesselsInZone() {
 }
 
 export async function getPositionsSince(since: string) {
-  return db.execute(sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > ${since}::timestamptz ORDER BY v.mmsi, p.timestamp DESC`);
+  const validSince = TimestampSchema.parse(since);
+  return db.execute(sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > ${validSince}::timestamptz ORDER BY v.mmsi, p.timestamp DESC`);
 }
 
 export async function getTrafficTimeline(hours: number = 24) {

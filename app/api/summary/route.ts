@@ -10,7 +10,7 @@ export async function GET(request: Request) {
       ? await getSummaryByDate(date)
       : await getLatestSummary();
 
-    return NextResponse.json(result.rows[0] ?? null);
+    return NextResponse.json(result[0] ?? null);
   } catch (error) {
     console.error("Failed to fetch summary:", error);
     return NextResponse.json(

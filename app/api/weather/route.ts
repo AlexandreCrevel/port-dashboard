@@ -17,8 +17,8 @@ export async function GET(request: Request) {
     ]);
 
     return NextResponse.json({
-      current: latestResult.rows[0] ?? null,
-      history: historyResult.rows,
+      current: latestResult[0] ?? null,
+      history: historyResult,
     });
   } catch (error) {
     console.error("Failed to fetch weather data:", error);

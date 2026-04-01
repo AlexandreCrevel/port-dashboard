@@ -19,8 +19,8 @@ describe("GET /api/weather", () => {
   });
 
   it("uses default 24 hours when no ?hours param", async () => {
-    mockGetLatestWeather.mockResolvedValueOnce({ rows: [] } as never);
-    mockGetWeatherHistory.mockResolvedValueOnce({ rows: [] } as never);
+    mockGetLatestWeather.mockResolvedValueOnce([] as never);
+    mockGetWeatherHistory.mockResolvedValueOnce([] as never);
 
     await GET(createRequest("http://localhost/api/weather"));
 
@@ -28,8 +28,8 @@ describe("GET /api/weather", () => {
   });
 
   it("uses provided ?hours=12 param", async () => {
-    mockGetLatestWeather.mockResolvedValueOnce({ rows: [] } as never);
-    mockGetWeatherHistory.mockResolvedValueOnce({ rows: [] } as never);
+    mockGetLatestWeather.mockResolvedValueOnce([] as never);
+    mockGetWeatherHistory.mockResolvedValueOnce([] as never);
 
     await GET(createRequest("http://localhost/api/weather?hours=12"));
 
@@ -37,8 +37,8 @@ describe("GET /api/weather", () => {
   });
 
   it("clamps hours to minimum 1", async () => {
-    mockGetLatestWeather.mockResolvedValueOnce({ rows: [] } as never);
-    mockGetWeatherHistory.mockResolvedValueOnce({ rows: [] } as never);
+    mockGetLatestWeather.mockResolvedValueOnce([] as never);
+    mockGetWeatherHistory.mockResolvedValueOnce([] as never);
 
     await GET(createRequest("http://localhost/api/weather?hours=0"));
 
@@ -46,8 +46,8 @@ describe("GET /api/weather", () => {
   });
 
   it("clamps hours to maximum 720", async () => {
-    mockGetLatestWeather.mockResolvedValueOnce({ rows: [] } as never);
-    mockGetWeatherHistory.mockResolvedValueOnce({ rows: [] } as never);
+    mockGetLatestWeather.mockResolvedValueOnce([] as never);
+    mockGetWeatherHistory.mockResolvedValueOnce([] as never);
 
     await GET(createRequest("http://localhost/api/weather?hours=999"));
 
@@ -60,10 +60,8 @@ describe("GET /api/weather", () => {
       { temperature: 21.0, wind_speed: 12 },
       { temperature: 22.5, wind_speed: 15 },
     ];
-    mockGetLatestWeather.mockResolvedValueOnce({
-      rows: [mockCurrent],
-    } as never);
-    mockGetWeatherHistory.mockResolvedValueOnce({ rows: mockHistory } as never);
+    mockGetLatestWeather.mockResolvedValueOnce([mockCurrent] as never);
+    mockGetWeatherHistory.mockResolvedValueOnce(mockHistory as never);
 
     const response = await GET(createRequest("http://localhost/api/weather"));
 
@@ -73,8 +71,8 @@ describe("GET /api/weather", () => {
   });
 
   it("returns current: null when no weather readings exist", async () => {
-    mockGetLatestWeather.mockResolvedValueOnce({ rows: [] } as never);
-    mockGetWeatherHistory.mockResolvedValueOnce({ rows: [] } as never);
+    mockGetLatestWeather.mockResolvedValueOnce([] as never);
+    mockGetWeatherHistory.mockResolvedValueOnce([] as never);
 
     const response = await GET(createRequest("http://localhost/api/weather"));
 

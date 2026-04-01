@@ -21,7 +21,7 @@ describe("GET /api/summary", () => {
       date: "2026-03-31",
       content: "All quiet in the port.",
     };
-    mockGetLatestSummary.mockResolvedValueOnce({ rows: [summaryRow] } as never);
+    mockGetLatestSummary.mockResolvedValueOnce([summaryRow] as never);
 
     const request = new Request("http://localhost/api/summary");
     const response = await GET(request);
@@ -35,7 +35,7 @@ describe("GET /api/summary", () => {
 
   it("calls getSummaryByDate with the date param when ?date is provided", async () => {
     const summaryRow = { date: "2026-03-30", content: "Heavy traffic." };
-    mockGetSummaryByDate.mockResolvedValueOnce({ rows: [summaryRow] } as never);
+    mockGetSummaryByDate.mockResolvedValueOnce([summaryRow] as never);
 
     const request = new Request("http://localhost/api/summary?date=2026-03-30");
     const response = await GET(request);
@@ -48,7 +48,7 @@ describe("GET /api/summary", () => {
   });
 
   it("returns null when query returns no rows", async () => {
-    mockGetLatestSummary.mockResolvedValueOnce({ rows: [] } as never);
+    mockGetLatestSummary.mockResolvedValueOnce([] as never);
 
     const request = new Request("http://localhost/api/summary");
     const response = await GET(request);

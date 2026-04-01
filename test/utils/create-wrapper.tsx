@@ -6,7 +6,9 @@ export const createWrapper = () => {
     defaultOptions: { queries: { retry: false } },
   });
 
-  return ({ children }: { children: ReactNode }) => (
+  const Wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
+
+  return Wrapper;
 };

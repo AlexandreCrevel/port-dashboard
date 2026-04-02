@@ -62,6 +62,13 @@ export const useMapLayers = (
       map.off("click", "vessel-circles", handleClick);
       map.off("mouseenter", "vessel-circles", handleEnter);
       map.off("mouseleave", "vessel-circles", handleLeave);
+
+      if (map.getLayer("vessel-labels")) map.removeLayer("vessel-labels");
+      if (map.getLayer("vessel-circles")) map.removeLayer("vessel-circles");
+      if (map.getLayer("geofence-line")) map.removeLayer("geofence-line");
+      if (map.getLayer("geofence-fill")) map.removeLayer("geofence-fill");
+      if (map.getSource("vessels")) map.removeSource("vessels");
+      if (map.getSource("geofence")) map.removeSource("geofence");
     };
   }, [mapRef, isLoaded]);
 

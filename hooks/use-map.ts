@@ -52,6 +52,11 @@ export const useMap = (
 
         map.on("load", () => setIsLoaded(true));
         mapRef.current = map;
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          console.error("Failed to load basemap style:", err);
+        }
       });
 
     return () => {

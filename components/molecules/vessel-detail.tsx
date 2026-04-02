@@ -28,7 +28,10 @@ export const VesselDetail = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && selectVessel(null)}>
-      <SheetContent side="right" className="w-[380px] overflow-y-auto">
+      <SheetContent
+        side="right"
+        className="w-full sm:w-[380px] overflow-y-auto"
+      >
         <SheetHeader>
           <SheetTitle>{vessel?.name ?? "Unknown Vessel"}</SheetTitle>
           <SheetDescription>MMSI: {selectedMmsi}</SheetDescription>

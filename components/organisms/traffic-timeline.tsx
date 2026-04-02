@@ -1,5 +1,6 @@
 "use client";
 
+import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import {
   LineChart,
@@ -14,7 +15,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFilterStore } from "@/stores/use-filter-store";
-import type { TrafficDataPoint } from "@/types";
+
+const TrafficDataPointSchema = z.object({
+  timestamp: z.string(),
+  count: z.coerce.number(),
+});
+const TrafficTimelineSchema = z.array(TrafficDataPointSchema);
 
 const TIME_RANGE_HOURS: Record<"24h" | "7d", number> = {
   "24h": 24,
@@ -28,7 +34,7 @@ function formatHour(value: string): string {
 
 function formatDayHour(value: string): string {
   const date = new Date(value);
-  return date.toLocaleDateString([], { weekday: "short", hour: "2-digit" });
+  return date.toLocaleString([], { weekday: "short", hour: "2-digit" });
 }
 
 export const TrafficTimeline = () => {
@@ -36,12 +42,12 @@ export const TrafficTimeline = () => {
   const setTimeRange = useFilterStore((s) => s.setTimeRange);
   const hours = TIME_RANGE_HOURS[timeRange];
 
-  const { data, isLoading } = useQuery<TrafficDataPoint[]>({
+  const { data, isLoading } = useQuery({
     queryKey: ["traffic-timeline", hours],
     queryFn: async () => {
       const res = await fetch(`/api/vessels/timeline?hours=${hours}`);
       if (!res.ok) throw new Error("Failed to fetch timeline");
-      return res.json();
+      return TrafficTimelineSchema.parse(await res.json());
     },
     refetchInterval: 60_000,
   });
@@ -84,10 +90,10 @@ export const TrafficTimeline = () => {
               />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip
-                labelFormatter={(label: string) =>
-                  new Date(label).toLocaleString()
+                labelFormatter={(label) =>
+                  new Date(String(label)).toLocaleString()
                 }
-                formatter={(value: number) => [value, "Vessels"]}
+                formatter={(value) => [value ?? 0, "Vessels"]}
               />
               <Line
                 type="monotone"

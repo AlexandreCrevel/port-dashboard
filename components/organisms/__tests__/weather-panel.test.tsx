@@ -59,7 +59,7 @@ describe("WeatherPanel", () => {
     mockUseWeather.mockReturnValue({
       data: undefined,
       isLoading: true,
-    } as ReturnType<typeof useWeather>);
+    } as unknown as ReturnType<typeof useWeather>);
 
     const { container } = render(<WeatherPanel />);
 
@@ -71,7 +71,7 @@ describe("WeatherPanel", () => {
     mockUseWeather.mockReturnValue({
       data: { current: mockCurrent, history: mockHistory },
       isLoading: false,
-    } as ReturnType<typeof useWeather>);
+    } as unknown as ReturnType<typeof useWeather>);
 
     render(<WeatherPanel />);
 
@@ -85,7 +85,7 @@ describe("WeatherPanel", () => {
     mockUseWeather.mockReturnValue({
       data: { current: mockCurrent, history: [] },
       isLoading: false,
-    } as ReturnType<typeof useWeather>);
+    } as unknown as ReturnType<typeof useWeather>);
 
     render(<WeatherPanel />);
 
@@ -106,7 +106,7 @@ describe("WeatherPanel", () => {
         history: [],
       },
       isLoading: false,
-    } as ReturnType<typeof useWeather>);
+    } as unknown as ReturnType<typeof useWeather>);
 
     render(<WeatherPanel />);
 
@@ -118,7 +118,7 @@ describe("WeatherPanel", () => {
     mockUseWeather.mockReturnValue({
       data: { current: mockCurrent, history: mockHistory },
       isLoading: false,
-    } as ReturnType<typeof useWeather>);
+    } as unknown as ReturnType<typeof useWeather>);
 
     render(<WeatherPanel />);
 
@@ -129,7 +129,7 @@ describe("WeatherPanel", () => {
     mockUseWeather.mockReturnValue({
       data: { current: mockCurrent, history: [] },
       isLoading: false,
-    } as ReturnType<typeof useWeather>);
+    } as unknown as ReturnType<typeof useWeather>);
 
     render(<WeatherPanel />);
 
@@ -140,7 +140,7 @@ describe("WeatherPanel", () => {
     mockUseWeather.mockReturnValue({
       data: { current: null, history: [] },
       isLoading: false,
-    } as ReturnType<typeof useWeather>);
+    } as unknown as ReturnType<typeof useWeather>);
 
     render(<WeatherPanel />);
 
@@ -152,7 +152,7 @@ describe("WeatherPanel", () => {
     mockUseWeather.mockReturnValue({
       data: undefined,
       isLoading: true,
-    } as ReturnType<typeof useWeather>);
+    } as unknown as ReturnType<typeof useWeather>);
 
     render(<WeatherPanel />);
 
@@ -163,7 +163,7 @@ describe("WeatherPanel", () => {
     mockUseWeather.mockReturnValue({
       data: undefined,
       isLoading: false,
-    } as ReturnType<typeof useWeather>);
+    } as unknown as ReturnType<typeof useWeather>);
 
     render(<WeatherPanel />);
 

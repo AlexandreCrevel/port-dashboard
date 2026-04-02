@@ -89,7 +89,7 @@ describe("VesselTypeChart", () => {
 
   it("shows empty state message when data is empty", () => {
     mockUsePositions.mockReturnValue({
-      data: [],
+      data: [] as VesselWithPosition[],
       isLoading: false,
     } as ReturnType<typeof usePositions>);
 

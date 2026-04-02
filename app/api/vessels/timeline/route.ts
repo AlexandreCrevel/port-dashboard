@@ -3,7 +3,9 @@ import { getTrafficTimeline } from "@/lib/queries";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const hours = parseInt(searchParams.get("hours") ?? "24", 10);
+  const parsed = parseInt(searchParams.get("hours") ?? "24", 10);
+  const hours =
+    Number.isNaN(parsed) || parsed <= 0 ? 24 : Math.min(parsed, 168);
 
   try {
     const data = await getTrafficTimeline(hours);

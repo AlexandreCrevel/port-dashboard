@@ -20,11 +20,9 @@ function aggregateByVesselType(
   const counts = new Map<string, number>();
 
   for (const vessel of vessels) {
-    const type = vessel.vesselType ?? "Other";
-    const known = Object.keys(VESSEL_TYPE_COLORS).includes(type)
-      ? type
-      : "Other";
-    counts.set(known, (counts.get(known) ?? 0) + 1);
+    const raw = vessel.vesselType;
+    const type = raw !== null && raw in VESSEL_TYPE_COLORS ? raw : "Other";
+    counts.set(type, (counts.get(type) ?? 0) + 1);
   }
 
   return Array.from(counts.entries())
@@ -68,9 +66,7 @@ export const VesselTypeChart = () => {
                   <Cell key={entry.type} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip
-                formatter={(value: number, name: string) => [value, name]}
-              />
+              <Tooltip formatter={(value, name) => [value ?? 0, name]} />
               <Legend />
             </PieChart>
           </ResponsiveContainer>

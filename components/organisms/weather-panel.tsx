@@ -126,13 +126,10 @@ export const WeatherPanel = () => {
                   />
                   <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip
-                    labelFormatter={(label: string) =>
-                      new Date(label).toLocaleString()
+                    labelFormatter={(label) =>
+                      new Date(String(label)).toLocaleString()
                     }
-                    formatter={(value: number) => [
-                      `${value} °C`,
-                      "Temperature",
-                    ]}
+                    formatter={(value) => [`${value ?? 0} °C`, "Temperature"]}
                   />
                   <Area
                     type="monotone"

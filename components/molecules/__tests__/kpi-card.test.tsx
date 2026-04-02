@@ -55,7 +55,7 @@ describe("KpiCard", () => {
       />,
     );
     // toLocaleString may format as "1,000" or "1 000" depending on locale
-    const valueEl = screen.getByText(/1.000/);
+    const valueEl = screen.getByText(/1[,.\s]?000/);
     expect(valueEl).toBeInTheDocument();
   });
 

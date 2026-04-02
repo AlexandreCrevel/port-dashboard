@@ -23,13 +23,12 @@ const formatTime = (date: Date): string =>
   });
 
 export const DashboardLayout = () => {
-  const [currentTime, setCurrentTime] = useState<string>("");
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    setCurrentTime(formatTime(new Date()));
-    const interval = setInterval(() => {
-      setCurrentTime(formatTime(new Date()));
-    }, 1000);
+    const tick = () => setNow(new Date());
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -42,10 +41,10 @@ export const DashboardLayout = () => {
         </h1>
         {/* Phase 7: NLQ search bar goes here */}
         <time
-          dateTime={new Date().toISOString()}
+          dateTime={now?.toISOString() ?? ""}
           className="text-sm text-muted-foreground tabular-nums"
         >
-          {currentTime}
+          {now ? formatTime(now) : ""}
         </time>
       </header>
 
@@ -54,7 +53,7 @@ export const DashboardLayout = () => {
         {/* Map — 2/3 width, spans full height on lg */}
         <section
           aria-label="Map view"
-          className="relative col-span-1 md:col-span-1 lg:col-span-2 lg:row-span-4 rounded-lg overflow-hidden border min-h-[300px]"
+          className="relative col-span-1 lg:col-span-2 lg:row-span-4 rounded-lg overflow-hidden border min-h-[300px]"
         >
           <MapContainer />
         </section>

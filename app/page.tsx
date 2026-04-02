@@ -1,9 +1,5 @@
-import { MapContainer } from "@/components/organisms/map-container";
+import { DashboardLayout } from "@/components/templates/dashboard-layout";
 
 export default function Home() {
-  return (
-    <main className="h-screen w-full relative">
-      <MapContainer />
-    </main>
-  );
+  return <DashboardLayout />;
 }

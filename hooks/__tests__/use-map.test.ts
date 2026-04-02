@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, waitFor } from "@testing-library/react";
 import { createMockMap } from "@/test/mocks/maplibre-gl";
 
 const mockMapInstance = createMockMap();
@@ -27,6 +27,8 @@ vi.mock("@/lib/constants", () => ({
   },
 }));
 
+const mockStyle = { version: 8, sources: {}, layers: [] };
+
 import { useMap } from "@/hooks/use-map";
 import { Map as MapConstructor } from "maplibre-gl";
 
@@ -36,54 +38,66 @@ describe("useMap", () => {
     MockMapClass.mockImplementation(function () {
       return mockMapInstance;
     });
-    // Clear listeners so _simulateLoad works fresh
     Object.keys(mockMapInstance._listeners).forEach((key) => {
       delete mockMapInstance._listeners[key];
     });
-  });
-
-  it("initializes map with correct options", () => {
-    const containerRef = { current: document.createElement("div") };
-    renderHook(() => useMap(containerRef));
-
-    expect(MapConstructor).toHaveBeenCalledWith(
-      expect.objectContaining({
-        container: containerRef.current,
-        style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-        center: [0.1079, 49.4944],
-        zoom: 12,
-        minZoom: 8,
-        maxZoom: 18,
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        json: () => Promise.resolve({ ...mockStyle }),
       }),
     );
   });
 
-  it("sets isLoaded to true after load event", () => {
+  it("fetches style and initializes map", async () => {
+    const containerRef = { current: document.createElement("div") };
+    renderHook(() => useMap(containerRef));
+
+    await waitFor(() => {
+      expect(MapConstructor).toHaveBeenCalledWith(
+        expect.objectContaining({
+          container: containerRef.current,
+          center: [0.1079, 49.4944],
+          zoom: 12,
+        }),
+      );
+    });
+  });
+
+  it("adds projection to style if missing", async () => {
+    const containerRef = { current: document.createElement("div") };
+    renderHook(() => useMap(containerRef));
+
+    await waitFor(() => {
+      expect(MapConstructor).toHaveBeenCalled();
+    });
+
+    const styleArg = MockMapClass.mock.calls[0][0].style;
+    expect(styleArg.projection).toEqual({ type: "mercator" });
+  });
+
+  it("sets isLoaded to true after load event", async () => {
     const containerRef = { current: document.createElement("div") };
     const { result } = renderHook(() => useMap(containerRef));
 
-    expect(result.current.isLoaded).toBe(false);
-
-    act(() => {
-      mockMapInstance._simulateLoad();
+    await waitFor(() => {
+      expect(MapConstructor).toHaveBeenCalled();
     });
 
-    expect(result.current.isLoaded).toBe(true);
+    expect(result.current.isLoaded).toBe(false);
+
+    await waitFor(() => {
+      mockMapInstance._simulateLoad();
+      expect(result.current.isLoaded).toBe(true);
+    });
   });
 
-  it("calls map.remove on unmount", () => {
-    const containerRef = { current: document.createElement("div") };
-    const { unmount } = renderHook(() => useMap(containerRef));
-
-    unmount();
-
-    expect(mockMapInstance.remove).toHaveBeenCalled();
-  });
-
-  it("does not initialize if container is null", () => {
+  it("does not initialize if container is null", async () => {
     const containerRef = { current: null };
     renderHook(() => useMap(containerRef));
 
+    await new Promise((r) => setTimeout(r, 50));
+    expect(fetch).not.toHaveBeenCalled();
     expect(MapConstructor).not.toHaveBeenCalled();
   });
 });

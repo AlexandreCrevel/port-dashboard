@@ -11,5 +11,4 @@ export {
   SSE_POLL_INTERVAL_MS,
   DATA_RETENTION_DAYS,
   WEATHER_API,
-  AIS_WEBSOCKET_URL,
 } from "./app-config";

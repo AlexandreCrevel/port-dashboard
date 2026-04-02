@@ -33,9 +33,9 @@ export const VESSEL_LABEL_LAYER: LayerSpecification = {
     "text-optional": true,
   },
   paint: {
-    "text-color": "#1f2937",
-    "text-halo-color": "#ffffff",
-    "text-halo-width": 1,
+    "text-color": "#e5e7eb",
+    "text-halo-color": "#111827",
+    "text-halo-width": 1.5,
   },
 };
 
@@ -47,7 +47,7 @@ export const GEOFENCE_FILL_LAYER: LayerSpecification = {
   source: "geofence",
   paint: {
     "fill-color": "#3b82f6",
-    "fill-opacity": 0.05,
+    "fill-opacity": 0.08,
   },
 };
 

@@ -16,5 +16,7 @@ export const formatHeading = (heading: number | null): string => {
   return `${heading}°`;
 };
 
-export const formatTimestamp = (date: Date): string =>
-  date.toLocaleString("fr-FR", { timeZone: "Europe/Paris" });
+export const formatTimestamp = (date: Date | null | undefined): string => {
+  if (!date) return "N/A";
+  return date.toLocaleString("fr-FR", { timeZone: "Europe/Paris" });
+};

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { getVesselsInZone } from "@/lib/queries";
+import { getVesselsInZone, mapVesselRow } from "@/lib/queries";
 
 export async function GET() {
   try {
     const result = await getVesselsInZone();
-    return NextResponse.json(result.rows);
+    return NextResponse.json(result.rows.map(mapVesselRow));
   } catch (error) {
     console.error("Failed to fetch vessels:", error);
     return NextResponse.json(

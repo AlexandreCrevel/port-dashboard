@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getVesselsInZone, getPositionsSince } from "@/lib/queries";
+import {
+  getVesselsInZone,
+  getPositionsSince,
+  mapVesselRow,
+} from "@/lib/queries";
 import { SSE_POLL_INTERVAL_MS } from "@/lib/constants";
 
 export const runtime = "nodejs";
@@ -11,7 +15,7 @@ export async function GET(request: Request): Promise<Response> {
   if (!isStreaming) {
     try {
       const result = await getVesselsInZone();
-      return NextResponse.json(result.rows);
+      return NextResponse.json(result.rows.map(mapVesselRow));
     } catch (error) {
       console.error("Failed to fetch positions:", error);
       return NextResponse.json(
@@ -31,8 +35,9 @@ export async function GET(request: Request): Promise<Response> {
           const result = await getPositionsSince(lastTimestamp);
           if (result.rows.length > 0) {
             lastTimestamp = new Date().toISOString();
+            const mapped = result.rows.map(mapVesselRow);
             controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify(result.rows)}\n\n`),
+              encoder.encode(`data: ${JSON.stringify(mapped)}\n\n`),
             );
           }
         } catch {

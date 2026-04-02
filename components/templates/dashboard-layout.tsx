@@ -7,6 +7,9 @@ import { VesselTypeChart } from "@/components/organisms/vessel-type-chart";
 import { TrafficTimeline } from "@/components/organisms/traffic-timeline";
 import { WeatherPanel } from "@/components/organisms/weather-panel";
 import { PORT_CONFIG } from "@/lib/constants/port-config";
+import { NlqSearchBar } from "@/components/molecules/nlq-search-bar";
+import { NlqResultsPanel } from "@/components/organisms/nlq-results-panel";
+import { useNlq } from "@/hooks/use-nlq";
 
 const MapContainer = dynamic(
   () =>
@@ -32,6 +35,8 @@ export const DashboardLayout = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const nlq = useNlq();
+
   return (
     <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
       {/* Header */}
@@ -39,7 +44,10 @@ export const DashboardLayout = () => {
         <h1 className="text-xl font-semibold tracking-tight">
           {PORT_CONFIG.name}
         </h1>
-        {/* Phase 7: NLQ search bar goes here */}
+        <NlqSearchBar
+          onSubmit={(query) => nlq.mutate(query)}
+          isLoading={nlq.isPending}
+        />
         <time
           dateTime={now?.toISOString() ?? ""}
           className="text-sm text-muted-foreground tabular-nums"
@@ -83,10 +91,19 @@ export const DashboardLayout = () => {
           </section>
         </div>
 
-        {/* Daily Summary — full width, Phase 8 placeholder */}
-        {/* TODO Phase 8: replace with <DailySummaryPanel /> */}
-        <div className="col-span-1 md:col-span-2 lg:col-span-3 rounded-lg border p-4 text-sm text-muted-foreground">
-          Daily Summary — coming in Phase 8
+        {/* Bottom panel: NLQ results or Phase 8 placeholder */}
+        <div className="col-span-1 md:col-span-2 lg:col-span-3">
+          {nlq.data || nlq.isPending || nlq.error ? (
+            <NlqResultsPanel
+              data={nlq.data}
+              isLoading={nlq.isPending}
+              error={nlq.error}
+            />
+          ) : (
+            <div className="rounded-lg border p-4 text-sm text-muted-foreground">
+              Daily Summary — coming in Phase 8
+            </div>
+          )}
         </div>
       </main>
     </div>

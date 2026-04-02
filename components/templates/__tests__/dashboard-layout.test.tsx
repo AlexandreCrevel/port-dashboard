@@ -1,7 +1,25 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
+import { createWrapper } from "@/test/utils/create-wrapper";
 
 afterEach(cleanup);
+
+vi.mock("@/hooks/use-nlq", () => ({
+  useNlq: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+    data: undefined,
+    error: null,
+  }),
+}));
+
+vi.mock("@/components/molecules/nlq-search-bar", () => ({
+  NlqSearchBar: () => <div data-testid="nlq-search-bar">NLQ</div>,
+}));
+
+vi.mock("@/components/organisms/nlq-results-panel", () => ({
+  NlqResultsPanel: () => <div data-testid="nlq-results-panel">Results</div>,
+}));
 
 vi.mock("next/dynamic", () => ({
   default: (_loader: unknown, _opts: unknown) => {

@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface WeatherCardProps {
   title: string;
@@ -10,27 +9,25 @@ interface WeatherCardProps {
 
 export const WeatherCard = ({ title, value, unit, icon }: WeatherCardProps) => {
   return (
-    <Card className="flex-1">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+    <div className="rounded-lg border border-border/50 bg-background/50 p-2.5">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
           {title}
-        </CardTitle>
-        <span className="text-muted-foreground">{icon}</span>
-      </CardHeader>
-      <CardContent>
-        <p className="text-2xl font-bold">
-          {value !== null ? (
-            <>
-              {value}
-              <span className="ml-1 text-sm font-normal text-muted-foreground">
-                {unit}
-              </span>
-            </>
-          ) : (
-            "N/A"
-          )}
-        </p>
-      </CardContent>
-    </Card>
+        </span>
+        <span className="text-muted-foreground/50">{icon}</span>
+      </div>
+      <p className="text-lg font-semibold tabular-nums">
+        {value !== null ? (
+          <>
+            {value}
+            <span className="ml-0.5 text-xs font-normal text-muted-foreground">
+              {unit}
+            </span>
+          </>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
+      </p>
+    </div>
   );
 };

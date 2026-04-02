@@ -19,9 +19,9 @@ describe("KpiRow", () => {
 
     render(<KpiRow />);
 
-    expect(screen.getByText("Vessels in Zone")).toBeInTheDocument();
-    expect(screen.getByText("Arrivals Today")).toBeInTheDocument();
-    expect(screen.getByText("Departures Today")).toBeInTheDocument();
+    expect(screen.getByText("In Zone")).toBeInTheDocument();
+    expect(screen.getByText("Arrivals")).toBeInTheDocument();
+    expect(screen.getByText("Departures")).toBeInTheDocument();
   });
 
   it("displays values from useKpi data", () => {

@@ -20,7 +20,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("font-sans", geist.variable)}
+      className={cn("dark font-sans", geist.variable)}
     >
       <body>
         <Providers>{children}</Providers>

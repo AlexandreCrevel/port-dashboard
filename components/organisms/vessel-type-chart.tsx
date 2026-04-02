@@ -36,23 +36,22 @@ function aggregateByVesselType(
 
 export const VesselTypeChart = () => {
   const { data, isLoading } = usePositions();
-
   const chartData = data ? aggregateByVesselType(data) : [];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Vessel Types</CardTitle>
+    <Card className="bg-card/50">
+      <CardHeader className="p-3 pb-0">
+        <CardTitle className="text-sm">Vessel Types</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-3 pt-2">
         {isLoading ? (
-          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-[180px] w-full" />
         ) : chartData.length === 0 ? (
-          <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
+          <div className="flex h-[180px] items-center justify-center text-xs text-muted-foreground">
             No vessel data available
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={256}>
+          <ResponsiveContainer width="100%" height={180}>
             <PieChart>
               <Pie
                 data={chartData}
@@ -60,14 +59,24 @@ export const VesselTypeChart = () => {
                 nameKey="type"
                 cx="50%"
                 cy="50%"
-                outerRadius={80}
+                outerRadius={60}
+                strokeWidth={1}
+                stroke="hsl(var(--border))"
               >
                 {chartData.map((entry) => (
                   <Cell key={entry.type} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value, name) => [value ?? 0, name]} />
-              <Legend />
+              <Tooltip
+                formatter={(value, name) => [value ?? 0, name]}
+                contentStyle={{
+                  background: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: "11px" }} iconSize={8} />
             </PieChart>
           </ResponsiveContainer>
         )}

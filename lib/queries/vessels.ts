@@ -22,8 +22,9 @@ const VESSELS_IN_ZONE_BASE = sql`
 `;
 
 export async function getVesselsInZone() {
+  const hours = PORT_CONFIG.positionStalenessHours;
   return db.execute(
-    sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > NOW() - INTERVAL '1 hour' ORDER BY v.mmsi, p.timestamp DESC`,
+    sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > NOW() - (${hours} * INTERVAL '1 hour') ORDER BY v.mmsi, p.timestamp DESC`,
   );
 }
 

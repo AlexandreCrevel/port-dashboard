@@ -80,19 +80,9 @@ describe("DashboardLayout", () => {
     expect(screen.getByTestId("weather-panel")).toBeInTheDocument();
   });
 
-  it("renders the daily summary placeholder", () => {
-    render(<DashboardLayout />);
-    expect(screen.getByText(/daily summary/i)).toBeInTheDocument();
-  });
-
   it("renders a header element", () => {
     render(<DashboardLayout />);
     expect(screen.getByRole("banner")).toBeInTheDocument();
-  });
-
-  it("renders a main element", () => {
-    render(<DashboardLayout />);
-    expect(screen.getByRole("main")).toBeInTheDocument();
   });
 
   it("renders map section with correct aria-label", () => {

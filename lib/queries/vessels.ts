@@ -1,7 +1,7 @@
-import { db } from '../db';
-import { sql } from 'drizzle-orm';
-import { z } from 'zod';
-import { PORT_CONFIG } from '../constants';
+import { db } from "../db";
+import { sql } from "drizzle-orm";
+import { z } from "zod";
+import { PORT_CONFIG } from "../constants";
 
 const TimestampSchema = z.string().datetime({ offset: true });
 
@@ -22,20 +22,24 @@ const VESSELS_IN_ZONE_BASE = sql`
 `;
 
 export async function getVesselsInZone() {
-  return db.execute(sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > NOW() - INTERVAL '1 hour' ORDER BY v.mmsi, p.timestamp DESC`);
+  return db.execute(
+    sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > NOW() - INTERVAL '1 hour' ORDER BY v.mmsi, p.timestamp DESC`,
+  );
 }
 
 export async function getPositionsSince(since: string) {
   const validSince = TimestampSchema.parse(since);
-  return db.execute(sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > ${validSince}::timestamptz ORDER BY v.mmsi, p.timestamp DESC`);
+  return db.execute(
+    sql`${VESSELS_IN_ZONE_BASE} AND p.timestamp > ${validSince}::timestamptz ORDER BY v.mmsi, p.timestamp DESC`,
+  );
 }
 
 export async function getTrafficTimeline(hours: number = 24) {
   return db.execute(sql`
-    SELECT date_trunc('hour', p.timestamp) as hour, COUNT(DISTINCT p.mmsi) as vessel_count
+    SELECT date_trunc('hour', p.timestamp) AS timestamp, COUNT(DISTINCT p.mmsi) AS count
     FROM positions p
     WHERE p.timestamp > NOW() - (${hours} * INTERVAL '1 hour')
     GROUP BY date_trunc('hour', p.timestamp)
-    ORDER BY hour
+    ORDER BY timestamp
   `);
 }

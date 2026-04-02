@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
-import { createWrapper } from "@/test/utils/create-wrapper";
-
 afterEach(cleanup);
 
 vi.mock("@/hooks/use-nlq", () => ({

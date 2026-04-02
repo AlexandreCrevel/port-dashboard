@@ -33,7 +33,7 @@ const shipStaticDataSchema = z.object({
 const aisMessageSchema = z.object({
   MessageType: z.string(),
   MetaData: metadataSchema,
-  Message: z.record(z.unknown()),
+  Message: z.record(z.string(), z.unknown()),
 });
 
 export interface ParsedPosition {

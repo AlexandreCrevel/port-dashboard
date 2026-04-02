@@ -1,3 +1,4 @@
+// @ts-expect-error -- @types/ws not installed; worker runs standalone
 import WebSocket from "ws";
 import { parseAisMessage, isPositionReport, isStaticData } from "./parser.js";
 import {
@@ -63,8 +64,10 @@ export function connect(apiKey: string) {
     }
   });
 
-  ws.on("error", (err) => console.error("[AIS] WebSocket error:", err.message));
-  ws.on("close", (code) => {
+  ws.on("error", (err: Error) =>
+    console.error("[AIS] WebSocket error:", err.message),
+  );
+  ws.on("close", (code: number) => {
     currentWs = null;
     if (shuttingDown) return;
 

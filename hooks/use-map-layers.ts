@@ -42,8 +42,8 @@ export const useMapLayers = (
 
     const handleClick = (e: MapLayerMouseEvent) => {
       const mmsi = e.features?.[0]?.properties?.mmsi;
-      if (typeof mmsi === "string") {
-        useMapStore.getState().selectVessel(mmsi);
+      if (mmsi != null) {
+        useMapStore.getState().selectVessel(String(mmsi));
       }
     };
 

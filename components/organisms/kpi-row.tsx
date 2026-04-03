@@ -8,23 +8,23 @@ export const KpiRow = () => {
   const { data, isLoading } = useKpi();
 
   return (
-    <div className="flex gap-4">
+    <div className="grid grid-cols-3 gap-2">
       <KpiCard
-        title="Vessels in Zone"
+        title="In Zone"
         value={data?.vesselsInZone ?? null}
-        icon={<Ship className="h-5 w-5" />}
+        icon={<Ship className="h-4 w-4" />}
         isLoading={isLoading}
       />
       <KpiCard
-        title="Arrivals Today"
+        title="Arrivals"
         value={data?.arrivalsToday ?? null}
-        icon={<ArrowDown className="h-5 w-5" />}
+        icon={<ArrowDown className="h-4 w-4" />}
         isLoading={isLoading}
       />
       <KpiCard
-        title="Departures Today"
+        title="Departures"
         value={data?.departuresToday ?? null}
-        icon={<ArrowUp className="h-5 w-5" />}
+        icon={<ArrowUp className="h-4 w-4" />}
         isLoading={isLoading}
       />
     </div>

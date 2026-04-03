@@ -3,6 +3,7 @@ import { GET } from "../route";
 
 vi.mock("@/lib/queries", () => ({
   getVesselsInZone: vi.fn(),
+  mapVesselRow: vi.fn((row: Record<string, unknown>) => row),
 }));
 
 import { getVesselsInZone } from "@/lib/queries";

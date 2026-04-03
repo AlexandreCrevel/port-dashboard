@@ -1,7 +1,23 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
-
 afterEach(cleanup);
+
+vi.mock("@/hooks/use-nlq", () => ({
+  useNlq: () => ({
+    mutate: vi.fn(),
+    isPending: false,
+    data: undefined,
+    error: null,
+  }),
+}));
+
+vi.mock("@/components/molecules/nlq-search-bar", () => ({
+  NlqSearchBar: () => <div data-testid="nlq-search-bar">NLQ</div>,
+}));
+
+vi.mock("@/components/organisms/nlq-results-panel", () => ({
+  NlqResultsPanel: () => <div data-testid="nlq-results-panel">Results</div>,
+}));
 
 vi.mock("next/dynamic", () => ({
   default: (_loader: unknown, _opts: unknown) => {
@@ -64,19 +80,9 @@ describe("DashboardLayout", () => {
     expect(screen.getByTestId("weather-panel")).toBeInTheDocument();
   });
 
-  it("renders the daily summary placeholder", () => {
-    render(<DashboardLayout />);
-    expect(screen.getByText(/daily summary/i)).toBeInTheDocument();
-  });
-
   it("renders a header element", () => {
     render(<DashboardLayout />);
     expect(screen.getByRole("banner")).toBeInTheDocument();
-  });
-
-  it("renders a main element", () => {
-    render(<DashboardLayout />);
-    expect(screen.getByRole("main")).toBeInTheDocument();
   });
 
   it("renders map section with correct aria-label", () => {

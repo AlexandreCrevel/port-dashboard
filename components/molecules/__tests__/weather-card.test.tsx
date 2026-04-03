@@ -29,7 +29,7 @@ describe("WeatherCard", () => {
         icon={<Wind />}
       />,
     );
-    expect(screen.getByText("N/A")).toBeInTheDocument();
+    expect(screen.getByText("—")).toBeInTheDocument();
     expect(screen.queryByText("°C")).not.toBeInTheDocument();
   });
 
@@ -50,6 +50,6 @@ describe("WeatherCard", () => {
       <WeatherCard title="Wave Height" value="0.0" unit="m" icon={<Wind />} />,
     );
     expect(screen.getByText("0.0")).toBeInTheDocument();
-    expect(screen.queryByText("N/A")).not.toBeInTheDocument();
+    expect(screen.queryByText("—")).not.toBeInTheDocument();
   });
 });

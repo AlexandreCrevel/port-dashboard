@@ -110,7 +110,7 @@ describe("TrafficTimeline", () => {
     render(<TrafficTimeline />);
 
     expect(screen.getByTestId("responsive-container")).toBeInTheDocument();
-    expect(screen.getByText("Traffic Timeline")).toBeInTheDocument();
+    expect(screen.getByText("Traffic")).toBeInTheDocument();
   });
 
   it("shows empty state when data is empty", () => {

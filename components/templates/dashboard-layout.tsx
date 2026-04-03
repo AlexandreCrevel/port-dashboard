@@ -6,7 +6,11 @@ import { KpiRow } from "@/components/organisms/kpi-row";
 import { VesselTypeChart } from "@/components/organisms/vessel-type-chart";
 import { TrafficTimeline } from "@/components/organisms/traffic-timeline";
 import { WeatherPanel } from "@/components/organisms/weather-panel";
+import { NlqSearchBar } from "@/components/molecules/nlq-search-bar";
+import { NlqResultsPanel } from "@/components/organisms/nlq-results-panel";
+import { useNlq } from "@/hooks/use-nlq";
 import { PORT_CONFIG } from "@/lib/constants/port-config";
+import { Anchor } from "lucide-react";
 
 const MapContainer = dynamic(
   () =>
@@ -18,12 +22,12 @@ const formatTime = (date: Date): string =>
   date.toLocaleTimeString("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
     timeZone: PORT_CONFIG.timezone,
   });
 
 export const DashboardLayout = () => {
   const [now, setNow] = useState<Date | null>(null);
+  const nlq = useNlq();
 
   useEffect(() => {
     const tick = () => setNow(new Date());
@@ -34,61 +38,56 @@ export const DashboardLayout = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b shrink-0">
-        <h1 className="text-xl font-semibold tracking-tight">
-          {PORT_CONFIG.name}
-        </h1>
-        {/* Phase 7: NLQ search bar goes here */}
+      <header className="flex items-center gap-4 px-4 py-2 border-b border-border/50 shrink-0 bg-card/50">
+        <div className="flex items-center gap-2 shrink-0">
+          <Anchor className="h-5 w-5 text-primary" />
+          <h1 className="text-lg font-semibold tracking-tight">
+            {PORT_CONFIG.name}
+          </h1>
+        </div>
+        <div className="flex-1 flex justify-center">
+          <NlqSearchBar
+            onSubmit={(query) => nlq.mutate(query)}
+            isLoading={nlq.isPending}
+          />
+        </div>
         <time
           dateTime={now?.toISOString() ?? ""}
-          className="text-sm text-muted-foreground tabular-nums"
+          className="text-sm text-muted-foreground tabular-nums shrink-0"
         >
           {now ? formatTime(now) : ""}
         </time>
       </header>
 
-      {/* Main grid */}
-      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 min-h-0">
-        {/* Map — 2/3 width, spans full height on lg */}
-        <section
-          aria-label="Map view"
-          className="relative col-span-1 lg:col-span-2 lg:row-span-4 rounded-lg overflow-hidden border min-h-[300px]"
-        >
+      <div className="flex-1 flex min-h-0">
+        {/* Map — main area */}
+        <section aria-label="Map view" className="flex-1 relative min-w-0">
           <MapContainer />
         </section>
 
-        {/* Right sidebar — stacked panels */}
-        <div className="col-span-1 flex flex-col gap-4 min-h-0 overflow-y-auto">
-          <section aria-label="KPI metrics">
+        {/* Sidebar */}
+        <aside className="w-[340px] shrink-0 border-l border-border/50 flex flex-col min-h-0 overflow-y-auto bg-card/30">
+          <div className="p-3 space-y-3">
             <KpiRow />
-          </section>
-
-          <section
-            aria-label="Vessel type distribution"
-            className="flex-1 min-h-[200px]"
-          >
             <VesselTypeChart />
-          </section>
-
-          <section
-            aria-label="Traffic timeline"
-            className="flex-1 min-h-[200px]"
-          >
             <TrafficTimeline />
-          </section>
-
-          <section aria-label="Weather" className="flex-1 min-h-[200px]">
             <WeatherPanel />
-          </section>
-        </div>
+          </div>
+        </aside>
+      </div>
 
-        {/* Daily Summary — full width, Phase 8 placeholder */}
-        {/* TODO Phase 8: replace with <DailySummaryPanel /> */}
-        <div className="col-span-1 md:col-span-2 lg:col-span-3 rounded-lg border p-4 text-sm text-muted-foreground">
-          Daily Summary — coming in Phase 8
+      {/* Bottom panel — NLQ results */}
+      {(nlq.data || nlq.isPending || nlq.error) && (
+        <div className="shrink-0 border-t border-border/50 max-h-[300px] overflow-y-auto bg-card/30">
+          <div className="p-3">
+            <NlqResultsPanel
+              data={nlq.data}
+              isLoading={nlq.isPending}
+              error={nlq.error}
+            />
+          </div>
         </div>
-      </main>
+      )}
     </div>
   );
 };

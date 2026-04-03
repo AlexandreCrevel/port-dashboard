@@ -75,10 +75,10 @@ describe("WeatherPanel", () => {
 
     render(<WeatherPanel />);
 
-    expect(screen.getByText("Wind Speed")).toBeInTheDocument();
-    expect(screen.getByText("Wave Height")).toBeInTheDocument();
+    expect(screen.getByText("Wind")).toBeInTheDocument();
+    expect(screen.getByText("Waves")).toBeInTheDocument();
     expect(screen.getByText("Visibility")).toBeInTheDocument();
-    expect(screen.getByText("Temperature")).toBeInTheDocument();
+    expect(screen.getByText("Temp")).toBeInTheDocument();
   });
 
   it("renders current values with correct formatting", () => {
@@ -110,7 +110,7 @@ describe("WeatherPanel", () => {
 
     render(<WeatherPanel />);
 
-    const naElements = screen.getAllByText("N/A");
+    const naElements = screen.getAllByText("—");
     expect(naElements).toHaveLength(2);
   });
 
@@ -133,7 +133,7 @@ describe("WeatherPanel", () => {
 
     render(<WeatherPanel />);
 
-    expect(screen.getByText("No trend data available")).toBeInTheDocument();
+    expect(screen.getByText("No trend data")).toBeInTheDocument();
   });
 
   it("shows N/A cards when current is null", () => {
@@ -144,7 +144,7 @@ describe("WeatherPanel", () => {
 
     render(<WeatherPanel />);
 
-    const naElements = screen.getAllByText("N/A");
+    const naElements = screen.getAllByText("—");
     expect(naElements).toHaveLength(4);
   });
 
@@ -167,6 +167,6 @@ describe("WeatherPanel", () => {
 
     render(<WeatherPanel />);
 
-    expect(screen.getByText("Weather Conditions")).toBeInTheDocument();
+    expect(screen.getByText("Weather")).toBeInTheDocument();
   });
 });

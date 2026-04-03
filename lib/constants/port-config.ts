@@ -1,7 +1,7 @@
 export const PORT_CONFIG = {
-  name: 'Le Havre',
-  slug: 'le-havre',
-  timezone: 'Europe/Paris',
+  name: "Le Havre",
+  slug: "le-havre",
+  timezone: "Europe/Paris",
   center: {
     latitude: 49.4944,
     longitude: 0.1079,
@@ -12,8 +12,8 @@ export const PORT_CONFIG = {
     maxZoom: 18,
   },
   boundingBox: {
-    min: { latitude: 49.40, longitude: -0.15 },
-    max: { latitude: 49.55, longitude: 0.40 },
+    min: { latitude: 49.4, longitude: -0.15 },
+    max: { latitude: 49.55, longitude: 0.4 },
   },
   geofence: [
     [0.04, 49.46],
@@ -26,6 +26,7 @@ export const PORT_CONFIG = {
     latitude: 49.49,
     longitude: 0.11,
   },
+  positionStalenessHours: 6,
 } as const;
 
 export type PortConfig = typeof PORT_CONFIG;

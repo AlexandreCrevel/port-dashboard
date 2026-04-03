@@ -49,54 +49,54 @@ export const WeatherPanel = () => {
   const chartData = data?.history ? toChartData(data.history) : [];
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle>Weather Conditions</CardTitle>
+    <Card className="bg-card/50">
+      <CardHeader className="p-3 pb-0">
+        <CardTitle className="text-sm">Weather</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="p-3 pt-2 space-y-2">
         {isLoading ? (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-24 w-full" />
+                <Skeleton key={i} className="h-16 w-full" />
               ))}
             </div>
-            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-[120px] w-full" />
           </>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2">
               <WeatherCard
-                title="Wind Speed"
+                title="Wind"
                 value={formatReading(current?.windSpeed ?? null)}
                 unit="km/h"
-                icon={<Wind className="h-4 w-4" />}
+                icon={<Wind className="h-3.5 w-3.5" />}
               />
               <WeatherCard
-                title="Wave Height"
+                title="Waves"
                 value={formatReading(current?.waveHeight ?? null)}
                 unit="m"
-                icon={<Waves className="h-4 w-4" />}
+                icon={<Waves className="h-3.5 w-3.5" />}
               />
               <WeatherCard
                 title="Visibility"
                 value={formatReading(current?.visibility ?? null)}
                 unit="km"
-                icon={<Eye className="h-4 w-4" />}
+                icon={<Eye className="h-3.5 w-3.5" />}
               />
               <WeatherCard
-                title="Temperature"
+                title="Temp"
                 value={formatReading(current?.temperature ?? null)}
                 unit="°C"
-                icon={<Thermometer className="h-4 w-4" />}
+                icon={<Thermometer className="h-3.5 w-3.5" />}
               />
             </div>
 
             {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={160}>
+              <ResponsiveContainer width="100%" height={120}>
                 <AreaChart
                   data={chartData}
-                  margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
+                  margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
                 >
                   <defs>
                     <linearGradient
@@ -121,30 +121,40 @@ export const WeatherPanel = () => {
                   <XAxis
                     dataKey="timestamp"
                     tickFormatter={formatTime}
-                    tick={{ fontSize: 10 }}
+                    tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
                     interval="preserveStartEnd"
+                    stroke="hsl(var(--border))"
                   />
-                  <YAxis tick={{ fontSize: 10 }} />
+                  <YAxis
+                    tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
+                    stroke="hsl(var(--border))"
+                  />
                   <Tooltip
                     labelFormatter={(label) =>
                       new Date(String(label)).toLocaleString()
                     }
-                    formatter={(value) => [`${value ?? 0} °C`, "Temperature"]}
+                    formatter={(value) => [`${value ?? 0} °C`, "Temp"]}
+                    contentStyle={{
+                      background: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "6px",
+                      fontSize: "11px",
+                    }}
                   />
                   <Area
                     type="monotone"
                     dataKey="temperature"
                     stroke="hsl(var(--primary))"
-                    strokeWidth={2}
+                    strokeWidth={1.5}
                     fill="url(#tempGradient)"
                     dot={false}
-                    activeDot={{ r: 4 }}
+                    activeDot={{ r: 3 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex h-40 items-center justify-center text-sm text-muted-foreground">
-                No trend data available
+              <div className="flex h-[120px] items-center justify-center text-xs text-muted-foreground">
+                No trend data
               </div>
             )}
           </>
